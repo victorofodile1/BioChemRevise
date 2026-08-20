@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3.6.2.1 Nerve Impulses &middot; biochemrevise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --sidebar:#fbfbfa;
+    --border:#eceae7;
+    --text:#37352f;
+    --text-dim:#787774;
+    --text-faint:#9b9a97;
+    --hover:#f1f1ef;
+    --accent:#2383e2;
+    --red-bg:#fdebec; --red-line:#e88a8a; --red-text:#af3232;
+    --blue-bg:#e7f3f8; --blue-line:#7ec1e0;
+    --amber-bg:#fdf3dd; --amber-line:#e9b95d; --amber-text:#97690c;
+    --green-bg:#edf6ee; --green-line:#8bc79a; --green-text:#2f7a3f;
+    --purple-bg:#f4effa; --purple-line:#b39ce0;
+    --radius:6px;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+    --serif:'Source Serif 4',Georgia,serif;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  }
+  html.dark{
+    --bg:#191919; --sidebar:#202020; --border:#2f2f2f; --text:#e9e9e7; --text-dim:#9b9a97; --text-faint:#6f6f6c;
+    --hover:#2a2a2a; --red-bg:#3a2222; --amber-bg:#3a3222; --blue-bg:#1f2c34; --green-bg:#20302a; --purple-bg:#2c2536;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--sans);color:var(--text);background:var(--bg);font-size:15.5px;line-height:1.6;}
+  ::selection{background:#cbe6ff;}
+
+  .app{display:flex;min-height:100vh;}
+  .sidebar{
+    width:264px;flex:0 0 264px;background:var(--sidebar);border-right:1px solid var(--border);
+    padding:14px 8px;position:sticky;top:0;height:100vh;overflow-y:auto;
+  }
+  .workspace{display:flex;align-items:center;gap:8px;padding:6px 8px 14px;font-weight:600;font-size:14px;}
+  .workspace .emoji{font-size:18px;}
+  .side-search{
+    display:flex;align-items:center;gap:8px;padding:6px 8px;margin:0 0 6px;border-radius:5px;color:var(--text-dim);
+    font-size:13.5px;cursor:pointer;
+  }
+  .side-search:hover{background:var(--hover);}
+  .side-group-label{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-faint);
+    padding:14px 10px 4px;font-weight:600;}
+  .side-link{
+    display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;color:var(--text-dim);
+    font-size:13.5px;cursor:pointer;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .side-link .num{color:var(--text-faint);font-variant-numeric:tabular-nums;font-size:12px;width:14px;flex:0 0 auto;}
+  .side-link:hover{background:var(--hover);color:var(--text);}
+  .side-link.active{background:var(--hover);color:var(--text);font-weight:600;}
+  .side-tool{padding:5px 8px;border-radius:5px;font-size:13.5px;color:var(--text-dim);cursor:pointer;display:flex;gap:8px;align-items:center;}
+  .side-tool:hover{background:var(--hover);color:var(--text);}
+  .side-tool.active{background:var(--hover);color:var(--text);font-weight:600;}
+  .sidebar-footer{margin-top:14px;padding:8px 10px;font-size:12px;color:var(--text-faint);border-top:1px solid var(--border);}
+  .darkmode-toggle{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;color:var(--text-dim);font-size:13.5px;cursor:pointer;}
+  .darkmode-toggle:hover{background:var(--hover);}
+
+  .main{flex:1;min-width:0;padding:56px calc(50% - 380px);max-width:100%;}
+  @media (max-width:900px){ .main{padding:40px 20px;} .sidebar{position:fixed;left:-264px;transition:left .2s;z-index:50;box-shadow:0 0 0 2000px rgba(0,0,0,0);}
+    .sidebar.open{left:0;box-shadow:2px 0 24px rgba(0,0,0,.25);} .menu-btn{display:flex !important;} }
+  .menu-btn{display:none;position:fixed;top:14px;left:14px;z-index:60;background:var(--bg);border:1px solid var(--border);
+    border-radius:6px;width:34px;height:34px;align-items:center;justify-content:center;cursor:pointer;font-size:16px;}
+
+  .breadcrumb{color:var(--text-faint);font-size:13px;margin-bottom:8px;display:flex;gap:6px;align-items:center;}
+  .page-emoji{font-size:52px;margin-bottom:6px;}
+  h1.page-title{font-family:var(--sans);font-weight:800;font-size:34px;margin:0 0 6px;letter-spacing:-.01em;}
+  .subtitle{color:var(--text-dim);font-size:15px;margin-bottom:6px;}
+  .meta-row{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 30px;}
+  .pill{font-size:12px;background:var(--hover);color:var(--text-dim);padding:3px 9px;border-radius:100px;border:1px solid var(--border);}
+
+  section.spec-section{margin-bottom:52px;scroll-margin-top:24px;}
+  .sec-eyebrow{display:flex;align-items:center;gap:10px;color:var(--text-faint);font-size:12.5px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+  h2.sec-title{font-size:23px;font-weight:800;margin:0 0 14px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px;}
+  h2.sec-title .icon{font-size:22px;}
+  h3.sub-title{font-size:16px;font-weight:700;margin:26px 0 10px;}
+  p{margin:0 0 14px;}
+  .lede{color:var(--text-dim);font-size:15px;margin-bottom:18px;}
+
+  .callout{display:flex;gap:10px;padding:12px 14px;border-radius:var(--radius);margin:0 0 16px;font-size:14.5px;}
+  .callout .ic{flex:0 0 auto;font-size:17px;line-height:1.4;}
+  .callout.spec{background:var(--blue-bg);border:1px solid var(--blue-line);}
+  .callout.tip{background:var(--green-bg);border:1px solid var(--green-line);}
+  .callout.trap{background:var(--red-bg);border:1px solid var(--red-line);}
+  .callout.note{background:var(--purple-bg);border:1px solid var(--purple-line);}
+  .callout p:last-child{margin-bottom:0;}
+
+  details.toggle{border:1px solid var(--border);border-radius:var(--radius);margin:0 0 14px;overflow:hidden;background:var(--bg);}
+  details.toggle summary{
+    list-style:none;cursor:pointer;padding:10px 14px;display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;
+    background:var(--hover);
+  }
+  details.toggle[open] summary{border-bottom:1px solid var(--border);}
+  details.toggle summary::-webkit-details-marker{display:none;}
+  details.toggle summary .caret{transition:transform .15s;font-size:11px;color:var(--text-faint);}
+  details.toggle[open] summary .caret{transform:rotate(90deg);}
+  details.toggle.flag summary{background:var(--red-bg);color:var(--red-text);}
+  details.toggle.flag .body{background:var(--red-bg);}
+  details.toggle .body{padding:12px 14px;font-size:14px;background:var(--bg);}
+  details.toggle .body p:last-child{margin-bottom:0;}
+
+  table.compare{width:100%;border-collapse:collapse;margin:0 0 18px;font-size:14px;}
+  table.compare th, table.compare td{border:1px solid var(--border);padding:9px 12px;text-align:left;vertical-align:top;}
+  table.compare th{background:var(--hover);font-weight:600;font-size:13px;}
+  mark.credit{background:var(--amber-bg);color:var(--amber-text);padding:0 3px;border-radius:3px;font-weight:600;}
+
+  ul.tidy{margin:0 0 16px;padding-left:22px;}
+  ul.tidy li{margin-bottom:6px;}
+  ol.steps{margin:0 0 16px;padding-left:22px;}
+  ol.steps li{margin-bottom:9px;}
+
+  .checklist{list-style:none;margin:0 0 10px;padding:0;}
+  .checklist li{display:flex;gap:9px;align-items:flex-start;padding:5px 4px;border-radius:5px;font-size:14.5px;cursor:pointer;}
+  .checklist li:hover{background:var(--hover);}
+  .checklist input{margin-top:3px;}
+  .checklist li.checked span{color:var(--text-faint);text-decoration:line-through;}
+
+  .diagram-card{border:1px solid var(--border);border-radius:8px;padding:18px;margin:0 0 18px;background:var(--sidebar);}
+  .diagram-cap{font-size:12.5px;color:var(--text-faint);margin-top:8px;text-align:center;}
+  .diagram-card svg text{font-family:var(--sans);}
+
+  hr.div{border:none;border-top:1px solid var(--border);margin:40px 0;}
+
+  .toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-bottom:40px;}
+  .toc-item{border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:13.5px;display:flex;gap:8px;align-items:flex-start;cursor:pointer;}
+  .toc-item:hover{background:var(--hover);}
+  .toc-item .n{color:var(--text-faint);font-weight:700;font-variant-numeric:tabular-nums;}
+
+  /* mode bar (Full notes / Cram / Drill) */
+  .mode-bar{display:flex;gap:8px;margin-bottom:30px;border-bottom:1px solid var(--border);padding-bottom:16px;flex-wrap:wrap;}
+  .mode-tab{border:1px solid var(--border);background:var(--bg);color:var(--text-dim);border-radius:100px;padding:8px 16px;
+    font-size:13.5px;font-weight:600;cursor:pointer;font-family:var(--sans);}
+  .mode-tab:hover{background:var(--hover);}
+  .mode-tab.active{background:var(--text);color:var(--bg);border-color:var(--text);}
+
+  /* per-section explanation-level switcher */
+  .level-switcher{border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin:0 0 18px;background:var(--sidebar);
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .level-label{font-size:13px;font-weight:700;color:var(--text);}
+  .level-dots{display:flex;gap:6px;margin-left:auto;}
+  .level-dot{width:24px;height:24px;border-radius:50%;background:var(--hover);color:var(--text-dim);display:flex;
+    align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);}
+  .level-dot.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .level-block{}
+
+  /* cram view */
+  .cram-point{border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin:0 0 16px;background:var(--sidebar);}
+  .cram-point h3{margin:0 0 8px;font-size:15px;font-weight:800;}
+  .cram-point ul{margin:0;padding-left:20px;}
+  .cram-point li{margin-bottom:5px;font-size:14px;}
+
+  /* drill view */
+  .drill-group{margin-bottom:30px;}
+  .drill-group h3{font-size:16px;font-weight:800;margin:0 0 4px;}
+  .drill-group .lede{margin-bottom:14px;}
+
+  /* interactive step-through */
+  .stepper-wrap{border:1px solid var(--border);border-radius:8px;padding:20px;margin:0 0 20px;background:var(--sidebar);}
+  .stepper-caption{font-size:15px;min-height:52px;}
+  .stepper-nav{display:flex;align-items:center;gap:14px;margin:14px 0;flex-wrap:wrap;}
+  .stepper-dots{display:flex;gap:6px;flex-wrap:wrap;}
+  .step-dot{width:27px;height:27px;border-radius:50%;background:var(--hover);color:var(--text-dim);display:flex;
+    align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);}
+  .step-dot.active{background:var(--accent);color:#fff;border-color:var(--accent);transform:scale(1.12);}
+  .step-indicator{font-size:12.5px;color:var(--text-faint);font-weight:600;}
+
+  svg .dot-circle{fill:var(--hover);stroke:var(--border);stroke-width:1.5;transition:.15s;}
+  svg .dot-circle.active{fill:#2383e2;stroke:#2383e2;}
+  svg .dot-num{font-size:10px;fill:var(--text-dim);font-weight:700;text-anchor:middle;transition:.15s;}
+  svg .dot-num.active{fill:#fff;}
+  svg .dot-label{font-size:9px;fill:var(--text-faint);transition:.15s;}
+  svg .dot-label.active{fill:var(--text);font-weight:700;}
+
+  /* animated graph */
+  .graph-card{border:1px solid var(--border);border-radius:8px;padding:18px;background:var(--sidebar);margin:0 0 18px;}
+  .scenario-picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+  .scenario-chip{border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:13.5px;cursor:pointer;background:var(--bg);color:var(--text-dim);}
+  .scenario-chip:hover{background:var(--hover);}
+  .scenario-chip.active{background:var(--text);color:var(--bg);border-color:var(--text);}
+  .scenario-desc{font-size:13.5px;color:var(--text-dim);margin:8px 0 14px;}
+  polyline#graphLine{fill:none;stroke:#7c5cd6;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
+  polyline#graphLine.drawn{transition:stroke-dashoffset 1.3s ease;}
+  line.threshold-line{stroke:#af3232;stroke-dasharray:5 4;stroke-width:1.5;}
+  line.rest-line{stroke:var(--text-faint);stroke-dasharray:2 3;stroke-width:1;}
+
+  .tool-panel{max-width:720px;}
+  .tool-header{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+  .tool-header .badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px;background:var(--purple-bg);color:#6741a8;text-transform:uppercase;letter-spacing:.04em;}
+  html.dark .tool-header .badge{color:#c9b6ef;}
+  .tool-sub{color:var(--text-dim);font-size:14px;margin-bottom:22px;}
+  .topic-picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+  .topic-chip{border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:13.5px;cursor:pointer;background:var(--bg);color:var(--text-dim);}
+  .topic-chip:hover{background:var(--hover);}
+  .topic-chip.active{background:var(--text);color:var(--bg);border-color:var(--text);}
+
+  .tutor-box{border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:16px;background:var(--sidebar);min-height:70px;}
+  .tutor-level{font-size:11.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;font-weight:600;}
+  .tutor-text{font-size:15px;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;}
+  .btn{border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:6px;padding:8px 14px;font-size:13.5px;
+    cursor:pointer;font-family:var(--sans);font-weight:600;}
+  .btn:hover{background:var(--hover);}
+  .btn.primary{background:var(--text);color:var(--bg);border-color:var(--text);}
+  .btn.primary:hover{opacity:.85;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+
+  .qa-list{display:flex;flex-direction:column;gap:8px;margin-bottom:6px;}
+  .qa-q{border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:14px;cursor:pointer;}
+  .qa-q:hover{background:var(--hover);}
+  .qa-a{border-left:2px solid var(--accent);margin:6px 0 0 8px;padding:2px 0 2px 12px;font-size:13.5px;color:var(--text-dim);display:none;}
+  .qa-a.show{display:block;}
+
+  textarea.blurt{
+    width:100%;min-height:160px;border:1px solid var(--border);border-radius:8px;padding:14px;font-family:var(--sans);
+    font-size:14.5px;resize:vertical;background:var(--bg);color:var(--text);
+  }
+  textarea.blurt:focus{outline:2px solid var(--accent);outline-offset:-1px;}
+  .timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:13px;color:var(--text-dim);}
+  .result-card{border:1px solid var(--border);border-radius:8px;padding:18px;margin-top:16px;background:var(--sidebar);display:none;}
+  .result-card.show{display:block;}
+  .coverage-bar-track{height:8px;border-radius:100px;background:var(--border);overflow:hidden;margin:6px 0 14px;}
+  .coverage-bar-fill{height:100%;background:var(--green-line);border-radius:100px;transition:width .4s;}
+  .kw-grid{display:flex;flex-wrap:wrap;gap:7px;}
+  .kw{font-size:12.5px;padding:4px 10px;border-radius:100px;border:1px solid var(--border);color:var(--text-dim);}
+  .kw.hit{background:var(--green-bg);border-color:var(--green-line);color:var(--green-text);}
+  .kw.miss{background:var(--red-bg);border-color:var(--red-line);color:var(--red-text);}
+
+  .mic-row{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+  .mic-btn{width:54px;height:54px;border-radius:50%;background:var(--red-bg);border:2px solid var(--red-line);
+    display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;flex:0 0 auto;}
+  .mic-btn.rec{background:#e14b4b;border-color:#e14b4b;animation:pulse 1.2s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(225,75,75,.4);}70%{box-shadow:0 0 0 12px rgba(225,75,75,0);}100%{box-shadow:0 0 0 0 rgba(225,75,75,0);}}
+  .mic-status{font-size:13.5px;color:var(--text-dim);}
+
+  footer.page-footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--border);color:var(--text-faint);font-size:12.5px;}
+</style>
+<meta name="description" content="How a neurone generates, propagates and speeds up an electrical impulse — the resting potential, the action potential, the all-or-nothing principle, the refractory period, and what">
+<meta property="og:title" content="3.6.2.1 Nerve Impulses">
+<meta property="og:description" content="How a neurone generates, propagates and speeds up an electrical impulse — the resting potential, the action potential, the all-or-nothing principle, the refractory period, and what">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://biochemrevise.co.uk/notes/3-6-2-1-nerve-impulses">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%A7%AC%3C/text%3E%3C/svg%3E">
+<script>(function(){try{var t=localStorage.getItem('bcr-theme');
+if(t==='dark'||(t===null&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){
+document.documentElement.classList.add('dark');}}catch(e){}})();</script>
+
+<style id="site-nav-css">
+  .brand{display:flex;align-items:center;gap:8px;padding:6px 8px 4px;font-weight:700;font-size:14.5px;
+    color:var(--text);text-decoration:none;border-radius:5px;letter-spacing:-.01em;}
+  .brand:hover{background:var(--hover);}
+  .brand .emoji{font-size:17px;}
+  .brand .tld{color:var(--text-faint);font-weight:500;}
+  .side-home{display:flex;align-items:center;gap:8px;padding:5px 8px;margin-bottom:2px;border-radius:5px;
+    color:var(--text-dim);font-size:13.5px;text-decoration:none;}
+  .side-home:hover{background:var(--hover);color:var(--text);}
+  .site-nav{margin-top:6px;}
+  .site-nav details{margin:0 0 1px;}
+  .site-nav summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:7px;padding:5px 8px;
+    border-radius:5px;font-size:13px;color:var(--text-dim);font-weight:500;user-select:none;}
+  .site-nav summary::-webkit-details-marker{display:none;}
+  .site-nav summary:hover{background:var(--hover);color:var(--text);}
+  .site-nav summary .chev{font-size:9px;color:var(--text-faint);transition:transform .15s;flex:0 0 auto;}
+  .site-nav details[open] > summary .chev{transform:rotate(90deg);}
+  .site-nav summary .tnum{font-variant-numeric:tabular-nums;color:var(--text-faint);font-size:11.5px;flex:0 0 auto;}
+  .site-nav summary .tname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .site-nav .sub{padding-left:8px;margin:1px 0 4px;border-left:1px solid var(--border);margin-left:14px;}
+  .site-nav .sub a{display:block;padding:4px 8px;border-radius:5px;font-size:12.5px;color:var(--text-dim);
+    text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .site-nav .sub a:hover{background:var(--hover);color:var(--text);}
+  .site-nav .sub a.here{background:var(--hover);color:var(--text);font-weight:600;}
+  .site-nav .sub a .n{color:var(--text-faint);font-variant-numeric:tabular-nums;font-size:11.5px;margin-right:6px;}
+  .pager{display:flex;gap:12px;margin:56px 0 8px;padding-top:22px;border-top:1px solid var(--border);}
+  .pager a{flex:1;min-width:0;display:block;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);
+    text-decoration:none;color:var(--text);transition:background .12s;}
+  .pager a:hover{background:var(--hover);}
+  .pager .lbl{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-faint);
+    font-weight:600;margin-bottom:3px;}
+  .pager .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .pager .num{color:var(--text-faint);font-weight:500;font-variant-numeric:tabular-nums;}
+  .pager a.next{text-align:right;}
+  .pager a.ghost{visibility:hidden;}
+  @media (max-width:620px){ .pager{flex-direction:column;} .pager a.ghost{display:none;} }
+</style>
+
+
+<style id="practice-css">
+  .practice{border:1px solid var(--border);border-radius:var(--radius);margin:26px 0 0;
+    background:var(--sidebar);overflow:hidden;}
+  .prac-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    padding:11px 16px;border-bottom:1px solid var(--border);background:var(--bg);}
+  .prac-title{font-weight:700;font-size:13.5px;letter-spacing:-.01em;}
+  .prac-count{font-size:12.5px;color:var(--text-faint);}
+  .prac-count b{color:var(--text-dim);font-variant-numeric:tabular-nums;}
+  .lvl-switch{margin-left:auto;display:flex;gap:2px;background:var(--hover);
+    border-radius:100px;padding:2px;}
+  .lvl-switch button{border:0;background:none;font:inherit;font-size:11.5px;font-weight:600;
+    color:var(--text-dim);padding:3px 11px;border-radius:100px;cursor:pointer;line-height:1.5;}
+  .lvl-switch button.on{background:var(--bg);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.09);}
+  .prac-body{padding:4px 16px 0;}
+  .prac-group{padding:14px 0;border-bottom:1px solid var(--border);}
+  .prac-group:last-child{border-bottom:0;}
+  .prac-stem{font-size:14px;color:var(--text);margin-bottom:10px;}
+  .prac-fig{margin:0 0 12px;text-align:center;}
+  .prac-fig img{max-width:100%;height:auto;border:1px solid var(--border);
+    border-radius:5px;background:#fff;}
+  html.dark .prac-fig img{background:#f7f7f5;}
+  .prac-figdesc{font-size:12.5px;color:var(--text-dim);font-style:italic;margin:0 0 10px;}
+  .prac-q{margin:0 0 4px;padding:9px 0 2px;}
+  .q-head{display:flex;align-items:baseline;gap:9px;margin-bottom:4px;}
+  .q-no{font-weight:700;font-size:13px;font-variant-numeric:tabular-nums;color:var(--text);}
+  .q-marks{font-size:11.5px;color:var(--text-faint);font-weight:600;}
+  .q-lvl{font-size:10px;font-weight:700;letter-spacing:.04em;padding:1px 6px;border-radius:100px;
+    background:var(--hover);color:var(--text-faint);}
+  .q-lvl.as{background:var(--blue-bg);color:#2c6b8a;}
+  .q-lvl.a2{background:var(--purple-bg);color:#6a4ca8;}
+  html.dark .q-lvl.as{color:#8fc9e4;} html.dark .q-lvl.a2{color:#c3aae8;}
+  .q-text{font-size:14.5px;line-height:1.55;}
+  .q-space{height:16px;}
+  .ms{margin:10px 0 2px;padding:12px 14px;border-radius:5px;background:var(--bg);
+    border:1px solid var(--border);font-size:13.5px;line-height:1.55;}
+  .ms[hidden]{display:none;}
+  .ms ol{margin:0;padding-left:20px;}
+  .ms ol li{margin:0 0 4px;}
+  .ms .tag{display:block;margin-top:9px;padding:7px 10px;border-radius:4px;font-size:12.5px;}
+  .ms .tag b{font-weight:700;}
+  .ms .acc{background:var(--green-bg);}
+  .ms .rej{background:var(--red-bg);}
+  .ms .rul{background:var(--amber-bg);}
+  .ms .wrk{background:var(--blue-bg);}
+  .ms-ref{margin-top:9px;font-size:11.5px;color:var(--text-faint);font-family:var(--mono);}
+  .prac-foot{padding:12px 16px 14px;border-top:1px solid var(--border);background:var(--bg);}
+  .prac-reveal{font:inherit;font-size:13px;font-weight:600;padding:7px 15px;border-radius:5px;
+    border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;}
+  .prac-reveal:hover{background:var(--hover);}
+  .prac-note{font-size:11.5px;color:var(--text-faint);margin-top:9px;line-height:1.5;}
+  .prac-empty{display:none;padding:14px 16px;font-size:13px;color:var(--text-faint);}
+  @media print{ .prac-head .lvl-switch,.prac-reveal{display:none;} .ms[hidden]{display:block;} }
+</style>
+</head>
+<body>
+
+<div class="menu-btn" id="menuBtn">☰</div>
+
+<div class="app">
+  <nav class="sidebar" id="sidebar">
+    <a class="brand" href="/"><span class="emoji">&#129516;</span>biochemrevise<span class="tld">.co.uk</span></a>
+    <a class="side-home" href="/">&#8962; All topics &amp; search</a>
+    <div class="side-search" onclick="showNotes(); document.getElementById('notesTop').scrollIntoView({behavior:'smooth'});">🔍 Search this page…</div>
+
+    <div class="side-group-label">3.6.2.1 Notes</div>
+    <a class="side-link" data-target="s1"><span class="num">1</span> Neurone structure</a>
+    <a class="side-link" data-target="s2"><span class="num">2</span> The resting potential</a>
+    <a class="side-link" data-target="s3"><span class="num">3</span> Depolarisation &amp; the action potential</a>
+    <a class="side-link" data-target="s4"><span class="num">4</span> All-or-nothing principle</a>
+    <a class="side-link" data-target="s5"><span class="num">5</span> Saltatory vs continuous conduction</a>
+    <a class="side-link" data-target="s6"><span class="num">6</span> The refractory period</a>
+    <a class="side-link" data-target="s7"><span class="num">7</span> Factors affecting speed</a>
+    <a class="side-link" data-target="s8"><span class="num">8</span> Common mistakes</a>
+    <a class="side-link" data-target="s9"><span class="num">9</span> Using this in longer answers</a>
+    <a class="side-link" data-target="s10"><span class="num">10</span> Links, memory hook &amp; checklist</a>
+
+    <div class="side-group-label">AI study tools · demo</div>
+    <div class="side-tool" data-tool="tutor">🧑‍🏫 Tutor AI</div>
+    <div class="side-tool" data-tool="blurt">🧠 Blurt AI</div>
+    <div class="side-tool" data-tool="feynman">🎤 Feynman AI</div>
+    <a class="side-link" data-target="notesTop" style="margin-top:2px;">📄 Back to notes</a>
+
+    <div class="side-group-label">All notes</div>
+    <div class="site-nav">
+    <details>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.1</span><span class="tname">Biological molecules</span></summary>
+    <div class="sub">
+    <a href="/notes/3-1-1-monomers-and-polymers"><span class="n">3.1.1</span>Monomers and Polymers</a>
+    <a href="/notes/3-1-2-carbohydrates"><span class="n">3.1.2</span>Carbohydrates</a>
+    <a href="/notes/3-1-3-lipids"><span class="n">3.1.3</span>Lipids</a>
+    <a href="/notes/3-1-4-1-general-properties-of-proteins"><span class="n">3.1.4.1</span>General Properties of Proteins</a>
+    <a href="/notes/3-1-4-2-many-proteins-are-enzymes"><span class="n">3.1.4.2</span>Many Proteins Are Enzymes</a>
+    <a href="/notes/3-1-5-1-structure-of-dna-and-rna"><span class="n">3.1.5.1</span>Structure of DNA and RNA</a>
+    <a href="/notes/3-1-5-2-dna-replication"><span class="n">3.1.5.2</span>DNA Replication</a>
+    <a href="/notes/3-1-6-atp"><span class="n">3.1.6</span>ATP</a>
+    <a href="/notes/3-1-7-water"><span class="n">3.1.7</span>Water</a>
+    <a href="/notes/3-1-8-inorganic-ions"><span class="n">3.1.8</span>Inorganic Ions</a>
+    </div></details>
+    <details>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.2</span><span class="tname">Cells</span></summary>
+    <div class="sub">
+    <a href="/notes/3-2-1-1-structure-of-eukaryotic-cells"><span class="n">3.2.1.1</span>Structure of Eukaryotic Cells</a>
+    <a href="/notes/3-2-1-2-structure-of-prokaryotic-cells-and-of-viruses"><span class="n">3.2.1.2</span>Structure of Prokaryotic Cells and of Viruses</a>
+    <a href="/notes/3-2-1-3-methods-of-studying-cells"><span class="n">3.2.1.3</span>Methods of Studying Cells</a>
+    <a href="/notes/3-2-2-all-cells-arise-from-other-cells"><span class="n">3.2.2</span>All Cells Arise From Other Cells</a>
+    <a href="/notes/3-2-3-transport-across-cell-membranes"><span class="n">3.2.3</span>Transport Across Cell Membranes</a>
+    <a href="/notes/3-2-4-cell-recognition-and-the-immune-system"><span class="n">3.2.4</span>Cell Recognition and the Immune System</a>
+    </div></details>
+    <details>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.3</span><span class="tname">Exchange</span></summary>
+    <div class="sub">
+    <a href="/notes/3-3-1-surface-area-to-volume-ratio"><span class="n">3.3.1</span>Surface Area to Volume Ratio</a>
+    <a href="/notes/3-3-2-gas-exchange"><span class="n">3.3.2</span>Gas Exchange</a>
+    <a href="/notes/3-3-3-digestion-and-absorption"><span class="n">3.3.3</span>Digestion and Absorption</a>
+    <a href="/notes/3-3-4-1-mass-transport-in-animals"><span class="n">3.3.4.1</span>Mass Transport in Animals</a>
+    <a href="/notes/3-3-4-2-mass-transport-in-plants"><span class="n">3.3.4.2</span>Mass Transport in Plants</a>
+    </div></details>
+    <details>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.4</span><span class="tname">Genetic information &amp; variation</span></summary>
+    <div class="sub">
+    <a href="/notes/3-4-1-dna-genes-and-chromosomes"><span class="n">3.4.1</span>DNA, Genes and Chromosomes</a>
+    <a href="/notes/3-4-2-dna-and-protein-synthesis"><span class="n">3.4.2</span>DNA and Protein Synthesis</a>
+    <a href="/notes/3-4-3-genetic-diversity-mutation-and-meiosis"><span class="n">3.4.3</span>Genetic Diversity, Mutation and Meiosis</a>
+    <a href="/notes/3-4-4-genetic-diversity-and-adaptation"><span class="n">3.4.4</span>Genetic Diversity and Adaptation</a>
+    <a href="/notes/3-4-5-species-and-taxonomy"><span class="n">3.4.5</span>Species and Taxonomy</a>
+    <a href="/notes/3-4-6-biodiversity-within-a-community"><span class="n">3.4.6</span>Biodiversity Within a Community</a>
+    <a href="/notes/3-4-7-investigating-diversity"><span class="n">3.4.7</span>Investigating Diversity</a>
+    </div></details>
+    <details>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.5</span><span class="tname">Energy transfers</span></summary>
+    <div class="sub">
+    <a href="/notes/3-5-1-photosynthesis"><span class="n">3.5.1</span>Photosynthesis</a>
+    <a href="/notes/3-5-2-respiration"><span class="n">3.5.2</span>Respiration</a>
+    <a href="/notes/3-5-3-energy-and-ecosystems"><span class="n">3.5.3</span>Energy and Ecosystems</a>
+    <a href="/notes/3-5-4-nutrient-cycles"><span class="n">3.5.4</span>Nutrient Cycles</a>
+    </div></details>
+    <details open>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.6</span><span class="tname">Responding to change</span></summary>
+    <div class="sub">
+    <a href="/notes/3-6-1-1-survival-and-response"><span class="n">3.6.1.1</span>Survival and Response</a>
+    <a href="/notes/3-6-1-2-receptors"><span class="n">3.6.1.2</span>Receptors</a>
+    <a href="/notes/3-6-1-3-control-of-heart-rate"><span class="n">3.6.1.3</span>Control of Heart Rate</a>
+    <a href="/notes/3-6-2-1-nerve-impulses" class="here"><span class="n">3.6.2.1</span>Nerve Impulses</a>
+    <a href="/notes/3-6-2-2-synaptic-transmission"><span class="n">3.6.2.2</span>Synaptic Transmission</a>
+    <a href="/notes/3-6-3-skeletal-muscles"><span class="n">3.6.3</span>Skeletal Muscles as Effectors</a>
+    <a href="/notes/3-6-4-1-principles-of-homeostasis-and-negative-feedback"><span class="n">3.6.4.1</span>Principles of Homeostasis and Negative Feedback</a>
+    <a href="/notes/3-6-4-2-control-of-blood-glucose-concentration"><span class="n">3.6.4.2</span>Control of Blood Glucose Concentration</a>
+    <a href="/notes/3-6-4-3-control-of-blood-water-potential"><span class="n">3.6.4.3</span>Control of Blood Water Potential</a>
+    </div></details>
+    <details>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.7</span><span class="tname">Genetics &amp; ecosystems</span></summary>
+    <div class="sub">
+    <a href="/notes/3-7-1-inheritance"><span class="n">3.7.1</span>Inheritance</a>
+    <a href="/notes/3-7-2-populations"><span class="n">3.7.2</span>Populations</a>
+    <a href="/notes/3-7-3-evolution-may-lead-to-speciation"><span class="n">3.7.3</span>Evolution May Lead to Speciation</a>
+    <a href="/notes/3-7-4-populations-in-ecosystems"><span class="n">3.7.4</span>Populations in Ecosystems</a>
+    </div></details>
+    <details>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.8</span><span class="tname">Control of gene expression</span></summary>
+    <div class="sub">
+    <a href="/notes/3-8-1-alteration-of-the-sequence-of-bases-in-dna"><span class="n">3.8.1</span>Alteration of the Sequence of Bases in DNA</a>
+    <a href="/notes/3-8-2-1-most-of-a-cells-dna-is-not-translated"><span class="n">3.8.2.1</span>Most of a Cell&#x27;s DNA is Not Translated</a>
+    <a href="/notes/3-8-2-2-regulation-of-transcription-and-translation"><span class="n">3.8.2.2</span>Regulation of Transcription and Translation</a>
+    <a href="/notes/3-8-2-3-gene-expression-and-cancer"><span class="n">3.8.2.3</span>Gene Expression and Cancer</a>
+    <a href="/notes/3-8-3-using-genome-projects"><span class="n">3.8.3</span>Using Genome Projects</a>
+    <a href="/notes/3-8-4-1-recombinant-dna-technology"><span class="n">3.8.4.1</span>Recombinant DNA Technology</a>
+    <a href="/notes/3-8-4-2-dna-probes-and-screening"><span class="n">3.8.4.2</span>DNA Probes, Screening &amp; Personalised Medicine</a>
+    <a href="/notes/3-8-4-3-genetic-fingerprinting"><span class="n">3.8.4.3</span>Genetic Fingerprinting</a>
+    </div></details>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="darkmode-toggle" id="darkToggle">🌓 Toggle dark mode</div>
+      No account, no server — everything on this page runs in your browser and nothing is saved when you close the tab.
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <div class="mode-bar">
+      <button class="mode-tab active" data-mode="notes">📖 Full notes</button>
+      <button class="mode-tab" data-mode="cram">⚡ 5-min cram</button>
+      <button class="mode-tab" data-mode="drill">🎯 Markscheme-wording drill</button>
+    </div>
+
+    <div id="notesView">
+      <div class="breadcrumb" id="notesTop"><a href="/" style="color:inherit;text-decoration:none;">Biology</a> &nbsp;&rsaquo;&nbsp; A-level &nbsp;&rsaquo;&nbsp; <a href="/#t3-6" style="color:inherit;text-decoration:none;">3.6 Organisms respond to changes in their internal and external environments</a> &nbsp;&rsaquo;&nbsp; 3.6.2.1</div>
+      <div class="page-emoji">⚡</div>
+      <h1 class="page-title">Nerve Impulses</h1>
+      <p class="subtitle">How a neurone generates, propagates and speeds up an electrical impulse — the resting potential, the action potential, the all-or-nothing principle, the refractory period, and what actually makes some axons faster than others.</p>
+      <div class="meta-row">
+        <span class="pill">A-level Biology</span>
+        <span class="pill">Topic 3.6.2.1</span>
+        <span class="pill">10 sections</span>
+        <span class="pill">3 diagrams</span>
+        <span class="pill">3 AI study tools</span>
+        <span class="pill">7 exam questions</span>
+      </div>
+
+      <div class="toc-grid">
+        <div class="toc-item" data-jump="s1"><span class="n">1</span> Neurone structure</div>
+        <div class="toc-item" data-jump="s2"><span class="n">2</span> The resting potential</div>
+        <div class="toc-item" data-jump="s3"><span class="n">3</span> Depolarisation &amp; the action potential</div>
+        <div class="toc-item" data-jump="s4"><span class="n">4</span> All-or-nothing principle</div>
+        <div class="toc-item" data-jump="s5"><span class="n">5</span> Saltatory vs continuous conduction</div>
+        <div class="toc-item" data-jump="s6"><span class="n">6</span> The refractory period</div>
+        <div class="toc-item" data-jump="s7"><span class="n">7</span> Factors affecting speed</div>
+        <div class="toc-item" data-jump="s8"><span class="n">8</span> Common mistakes</div>
+        <div class="toc-item" data-jump="s9"><span class="n">9</span> Using this in longer answers</div>
+        <div class="toc-item" data-jump="s10"><span class="n">10</span> Links, memory hook &amp; checklist</div>
+      </div>
+
+      <div class="callout trap">
+        <div class="ic">⚠️</div>
+        <div><p><strong>The one habit that protects the most marks on this whole spec point:</strong> every mechanism here is either <strong>channel-mediated facilitated diffusion</strong> or <strong>active transport by the sodium–potassium pump</strong> — never confuse the two. Depolarisation and repolarisation are channel events only; the pump's job is to help set up and restore the resting potential between impulses, never to cause the spike itself. Say "ions" explicitly wherever they're involved, and always write "action potential" or "impulse" — never "message" or "signal."</p></div>
+      </div>
+
+      <!-- ================= SECTION 1 ================= -->
+      <section class="spec-section" id="s1">
+        <div class="sec-eyebrow">Section 1 · spec content point</div>
+        <h2 class="sec-title"><span class="icon">🔬</span> The structure of a myelinated motor neurone</h2>
+        <p class="lede">Everything else in this topic is a story about specific, named parts of this one cell. Learn the structure once, with each part's job attached, and every later mechanism becomes much easier to describe precisely.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "The structure of a myelinated motor neurone."</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s1">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s1" data-level="1" style="display:none;">
+          <p>Think of a neurone like an electrical cable running from your spinal cord to a muscle. The cell body is the "factory" end where everything the cell needs gets made. The long wire itself is the axon. Wrapped around most of the wire is a rubbery insulating coating — that's the myelin sheath, made by helper cells called Schwann cells. But the coating isn't continuous — there are small bare patches every so often, called nodes of Ranvier, where the wire is exposed.</p>
+          <ul class="tidy">
+            <li><strong>Cell body</strong> = the factory end, keeps the cell alive</li>
+            <li><strong>Axon</strong> = the long wire that carries the signal</li>
+            <li><strong>Myelin sheath</strong> = the insulating coating (it's electrical insulation, not a woolly jumper — it has nothing to do with keeping the cell warm)</li>
+            <li><strong>Nodes of Ranvier</strong> = the bare gaps in the coating</li>
+          </ul>
+        </div>
+        <div class="level-block" data-group="s1" data-level="2" style="display:none;">
+          <p>A motor neurone has a <strong>cell body</strong> containing the nucleus and the machinery for making proteins, with short branching <strong>dendrites</strong> bringing signals in. A single long <strong>axon</strong> carries the impulse away towards the muscle it controls. <strong>Schwann cells</strong> wrap around the axon in a series of segments, and the many layers of their membrane form the <strong>myelin sheath</strong> — a fatty layer that electrically insulates the axon. Between adjacent Schwann cells are small exposed gaps called the <strong>nodes of Ranvier</strong>, and — as later sections build on — these gaps are the only places along a myelinated axon where the impulse can actually be regenerated.</p>
+        </div>
+        <div class="level-block" data-group="s1" data-level="3">
+        <table class="compare">
+          <tr><th>Structure</th><th>What it is</th><th>What it does</th></tr>
+          <tr><td><strong>Cell body</strong></td><td>Contains the nucleus and most organelles (rough ER, Golgi, many mitochondria)</td><td>Synthesises proteins and neurotransmitter-related substances; keeps the whole cell alive</td></tr>
+          <tr><td><strong>Dendrites / dendrons</strong></td><td>Short, branched extensions from the cell body</td><td>Carry impulses towards the cell body</td></tr>
+          <tr><td><strong>Axon</strong></td><td>A single long, cylindrical extension surrounded by the axon (plasma) membrane</td><td>Carries the action potential away from the cell body, towards the effector</td></tr>
+          <tr><td><strong>Schwann cells</strong></td><td>Wrap themselves around the axon in a series of segments</td><td>Form the myelin sheath; can also carry out phagocytosis of cell debris</td></tr>
+          <tr><td><strong>Myelin sheath</strong></td><td>Multiple layers of Schwann cell membrane (largely lipid), wound around the axon</td><td><mark class="credit">Electrically insulates</mark> the axon membrane — not thermal insulation</td></tr>
+          <tr><td><strong>Nodes of Ranvier</strong></td><td>Small gaps between adjacent Schwann cells, where the axon membrane is exposed</td><td>Voltage-gated Na⁺ channels are concentrated here — <mark class="credit">the only place depolarisation can occur</mark> in a myelinated axon</td></tr>
+        </table>
+
+        <div class="diagram-card">
+          <svg viewBox="0 0 700 240" width="100%" role="img" aria-label="Labelled diagram of a myelinated motor neurone">
+            <text x="350" y="18" text-anchor="middle" font-size="12" fill="var(--text-faint)">A myelinated motor neurone (schematic)</text>
+
+            <ellipse cx="80" cy="120" rx="52" ry="46" fill="var(--blue-bg)" stroke="var(--blue-line)" stroke-width="1.5"/>
+            <circle cx="80" cy="120" r="16" fill="none" stroke="var(--blue-line)" stroke-width="1.5"/>
+            <text x="80" y="124" text-anchor="middle" font-size="8" fill="var(--text-dim)">nucleus</text>
+            <text x="80" y="180" text-anchor="middle" font-size="9" fill="var(--text-dim)" font-weight="700">CELL BODY</text>
+
+            <path d="M35 85 L15 65 M32 95 L8 90 M35 150 L14 165 M40 160 L28 185" stroke="var(--text-dim)" stroke-width="1.5" fill="none"/>
+            <text x="20" y="55" font-size="8" fill="var(--text-dim)">dendrites</text>
+
+            <line x1="132" y1="120" x2="640" y2="120" stroke="var(--text)" stroke-width="3"/>
+            <text x="380" y="108" text-anchor="middle" font-size="9" fill="var(--text-dim)">axon (plasma) membrane</text>
+
+            <g>
+              <rect x="150" y="103" width="80" height="34" rx="14" fill="var(--amber-bg)" stroke="var(--amber-line)" stroke-width="1.5"/>
+              <rect x="255" y="103" width="80" height="34" rx="14" fill="var(--amber-bg)" stroke="var(--amber-line)" stroke-width="1.5"/>
+              <rect x="360" y="103" width="80" height="34" rx="14" fill="var(--amber-bg)" stroke="var(--amber-line)" stroke-width="1.5"/>
+              <rect x="465" y="103" width="80" height="34" rx="14" fill="var(--amber-bg)" stroke="var(--amber-line)" stroke-width="1.5"/>
+            </g>
+            <text x="190" y="165" text-anchor="middle" font-size="8.5" fill="var(--amber-text)">myelin sheath</text>
+            <text x="190" y="178" text-anchor="middle" font-size="8" fill="var(--amber-text)">(Schwann cell membrane)</text>
+
+            <rect x="232" y="112" width="21" height="16" fill="var(--bg)" stroke="var(--red-line)" stroke-width="1.5"/>
+            <rect x="337" y="112" width="21" height="16" fill="var(--bg)" stroke="var(--red-line)" stroke-width="1.5"/>
+            <rect x="442" y="112" width="21" height="16" fill="var(--bg)" stroke="var(--red-line)" stroke-width="1.5"/>
+            <text x="242" y="65" text-anchor="middle" font-size="8.5" fill="var(--red-text)">node of Ranvier</text>
+            <text x="242" y="77" text-anchor="middle" font-size="7.5" fill="var(--red-text)">(Na⁺ channels here)</text>
+            <line x1="242" y1="80" x2="242" y2="110" stroke="var(--red-line)" stroke-width="1" stroke-dasharray="2 2"/>
+
+            <path d="M640 120 L665 105 M640 120 L672 120 M640 120 L665 135" stroke="var(--text)" stroke-width="2.5" fill="none"/>
+            <text x="655" y="150" text-anchor="middle" font-size="8.5" fill="var(--text-dim)">axon terminal</text>
+            <text x="655" y="162" text-anchor="middle" font-size="8" fill="var(--text-dim)">→ towards effector</text>
+          </svg>
+          <div class="diagram-cap">A myelinated motor neurone — the myelin sheath electrically insulates the axon in segments, exposing the membrane only at the nodes of Ranvier.</div>
+        </div>
+
+        <div class="callout tip">
+          <div class="ic">📌</div>
+          <div><p><strong>Marking habit worth building now:</strong> if you're asked to label an unfamiliar diagram or micrograph, give each structure with its function from the table above — a bare name on its own scores less than a name paired with what it does. The most tested confusion is mixing up the axon membrane itself with the Schwann cell/myelin wrapped around it — they're drawn touching, but they're two separate structures with two separate jobs.</p></div>
+        </div>
+
+        <details class="toggle flag">
+          <summary><span class="caret">▶</span> 🚩 Trap — "thermal" insulation</summary>
+          <div class="body">
+            <p>The myelin sheath gives <strong>electrical</strong> insulation, not thermal insulation. Writing "thermal insulation" is a persistent, explicitly penalised error — and this vocabulary underpins every resting-potential, action-potential and saltatory-conduction answer that follows, so it's worth getting exactly right here first.</p>
+          </div>
+        </details>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 2 ================= -->
+      <section class="spec-section" id="s2">
+        <div class="sec-eyebrow">Section 2 · spec content point</div>
+        <h2 class="sec-title"><span class="icon">🔋</span> The resting potential</h2>
+        <p class="lede">Before any impulse fires, an axon is already doing active work to sit at a stable, negative internal voltage. Three separate mechanisms combine to produce it — keep them distinct rather than blending them into one vague sentence.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "The establishment of a resting potential in terms of differential membrane permeability, electrochemical gradients and the movement of sodium ions and potassium ions."</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s2">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s2" data-level="1" style="display:none;">
+          <p>Imagine two rooms — inside the axon and outside it — each with a different crowd of two types of people: sodium people and potassium people. Even at rest, sodium people are mostly stuck outside and potassium people are mostly stuck inside, but the wall between the rooms leaks potassium people out faster than it lets sodium people in. There's also a tireless doorman (the pump) constantly pushing three sodium people out for every two potassium people he lets back in. All this leaking and pushing leaves the inside of the axon slightly short of positive charge compared to outside — like a battery, charged up and ready to go.</p>
+        </div>
+        <div class="level-block" data-group="s2" data-level="2" style="display:none;">
+          <p>At rest, there's more potassium inside the axon than outside, and more sodium outside than inside — these are the concentration gradients. The membrane is naturally leakier to potassium than to sodium, through permanently open "leak" channels, so potassium ions drift out faster than sodium ions drift in. On top of that, the sodium–potassium pump actively pumps 3 sodium ions out for every 2 potassium ions it pumps in, using ATP, working against both gradients. The net effect of the leakiness difference and the pump together is that the inside of the axon ends up negative relative to the outside — a resting potential of roughly −70 mV.</p>
+        </div>
+        <div class="level-block" data-group="s2" data-level="3">
+        <ol class="steps">
+          <li><strong>Concentration gradients:</strong> K⁺ concentration is higher inside the axon; Na⁺ concentration is higher outside it.</li>
+          <li><strong>Differential membrane permeability:</strong> the membrane is more permeable to K⁺ than to Na⁺, via potassium leak channels, so K⁺ diffuses out faster than Na⁺ diffuses in.</li>
+          <li><strong>Active transport by the sodium–potassium pump:</strong> 3 Na⁺ are pumped out for every 2 K⁺ pumped in, per cycle, against their concentration gradients, using ATP.</li>
+        </ol>
+        <p>Points 2 and 3 together leave the inside of the axon negative relative to the outside — the resting potential. This is heavily synoptic with active transport and membrane structure from earlier in the course.</p>
+
+        <div class="callout note">
+          <div class="ic">🔢</div>
+          <div><p><strong>Quick numbers:</strong> the resting potential is typically quoted as around <strong>−70 mV</strong> (inside negative relative to outside), though some sources give values closer to −65 mV — always use the exact figure given in a question rather than quoting one unprompted.</p></div>
+        </div>
+
+        <details class="toggle flag" open>
+          <summary><span class="caret">▶</span> 🚩 The single costliest omission</summary>
+          <div class="body">
+            <p>Two or three otherwise-correct points but with <strong>no reference to ions anywhere</strong> caps the answer very low — the word "ions" itself needs to appear, not just "sodium" and "potassium" used loosely without that word. Keep the permeability difference (point 2) and the active pumping (point 3) clearly separate — merging them into one vague "the pump maintains the potential" statement loses credit that keeping them distinct would earn.</p>
+          </div>
+        </details>
+        </div>
+      
+        <div class="practice"><div class="prac-head"><span class="prac-title">&#9997;&#65039; Exam-style practice</span><span class="prac-count"><b data-prac-count>2</b> questions &middot; <b data-prac-marks>5</b> marks</span></div><div class="prac-empty">No questions at this level for this section &mdash; switch to <b>Both</b> to see them all.</div><div class="prac-body"><div class="prac-group" data-level="A2"><div class="prac-stem">Figure 1 shows the changes in potential difference across the membrane of an axon during an action potential.</div><figure class="prac-fig"><img src="/notes/figures/3-6-2-1-nerve-impulses-a2-fig1.png" alt="Figure 1 shows the resting potential (A), peak of depolarisation (B), repolarisation (C) and the recovery period (D)." width="749" height="537" loading="lazy"></figure><div class="prac-q" data-marks="3"><div class="q-head"><span class="q-no">1.1</span><span class="q-marks">3 marks</span><span class="q-lvl a2">A2</span></div><div class="q-text">Explain how the resting potential at A is maintained.</div><div class="q-space"></div><div class="ms" hidden><ol><li>Higher concentration of sodium ions outside (than inside)</li><li>(Membrane) less permeable to sodium ions (entering than potassium ions leaving)</li><li>Sodium ions (actively) transported out and potassium ions in</li></ol><span class="tag acc"><b>Accept / ignore.</b> Accept “more” for “higher concentration”. Accept “sodium ions can’t diffuse in”. For “less permeable to sodium ions” accept “impermeable to sodium ions” or “sodium gates / channels are closed”. Accept 3 Na⁺ out and 2 K⁺ in, but reject if the numbers used are incorrect.</span><span class="tag rul"><b>Examiner rule.</b> If an answer provides two or three of these marking points without any reference to ions — award one mark maximum.</span><div class="ms-ref">AQA mark scheme &middot; 7402/2 Nov21 02.1 · 7402/2 SAMS 04.1</div></div></div><div class="prac-q" data-marks="2"><div class="q-head"><span class="q-no">1.2</span><span class="q-marks">2 marks</span><span class="q-lvl a2">A2</span></div><div class="q-text">Explain what is happening to the membrane at B.</div><div class="q-space"></div><div class="ms" hidden><ol><li>Sodium ion channels in the membrane open and sodium ions move in</li><li>The membrane depolarises — the inside becomes positive relative to the outside</li></ol><div class="ms-ref">AQA mark scheme &middot; 7402/2 SAMS 04.2 · spec statement</div></div></div></div></div><div class="prac-foot"><button type="button" class="prac-reveal">Show mark schemes</button><div class="prac-note">Questions are original, written in the style of real AQA past-paper questions. The mark schemes are AQA&rsquo;s own marking points, from the paper noted against each answer.</div></div></div>
+      </section>
+
+      <!-- ================= SECTION 3 ================= -->
+      <section class="spec-section" id="s3">
+        <div class="sec-eyebrow">Section 3 · spec content point</div>
+        <h2 class="sec-title"><span class="icon">📈</span> Depolarisation, repolarisation &amp; the action potential</h2>
+        <p class="lede">This is where the resting potential gets deliberately, temporarily overturned. Every step from here on is channel-driven facilitated diffusion — the pump plays no part in the spike itself.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "Changes in membrane permeability lead to depolarisation and the generation of an action potential. The all-or-nothing principle." (This section covers depolarisation, repolarisation and the action potential graph — Section 4 covers the all-or-nothing principle, the second half of the same specification content point.)</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s3">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s3" data-level="1" style="display:none;">
+          <p>Picture a row of doors along the wire, all shut. A strong enough knock (a stimulus reaching threshold) makes the first door fly open, and sodium people rush in — that makes the inside less negative, which makes the next door fly open too, and so on, like dominoes, until the inside actually flips positive for a moment. Then those doors slam shut, and a different set of doors open, letting potassium people rush back out, which brings the voltage back down — sometimes dipping slightly too far down before it settles back to normal, ready to fire again.</p>
+        </div>
+        <div class="level-block" data-group="s3" data-level="2" style="display:none;">
+          <p>If a stimulus is strong enough to push the membrane to around <strong>−55 mV (threshold)</strong>, voltage-gated sodium channels open and sodium ions flood in — this is <strong>depolarisation</strong>, and because more channels open the more the membrane depolarises, it snowballs (positive feedback) right up to about <strong>+40 mV</strong>. At that peak, the sodium channels close and voltage-gated potassium channels open instead, so potassium ions flow back out — this is <strong>repolarisation</strong>, bringing the potential back down. Because those potassium channels are a little slow to shut, slightly too much potassium leaves, so the membrane briefly dips below resting — <strong>hyperpolarisation</strong> — before settling back at −70 mV.</p>
+        </div>
+        <div class="level-block" data-group="s3" data-level="3">
+        <h3 class="sub-title">Depolarisation</h3>
+        <ul class="tidy">
+          <li>A stimulus depolarises the membrane; if it reaches threshold (≈ −55 mV), voltage-gated sodium channels open.</li>
+          <li>Na⁺ diffuses in down its electrochemical gradient, through the open channels — facilitated diffusion, never active transport.</li>
+          <li>The membrane becomes less negative, then positive — more channels open as it does so (positive feedback), driving the potential up towards +40 mV (an overshoot past 0 mV).</li>
+        </ul>
+        <h3 class="sub-title">Repolarisation and hyperpolarisation</h3>
+        <ul class="tidy">
+          <li>At the peak, voltage-gated sodium channels close.</li>
+          <li>Voltage-gated potassium channels open, and K⁺ diffuses out down its electrochemical gradient.</li>
+          <li>The membrane potential falls back towards resting; <strong>hyperpolarisation</strong> follows because the potassium channels are slightly slow to close, so slightly too much K⁺ leaves before they shut — the sodium–potassium pump and K⁺ leak channels then restore the resting potential, ready to fire again.</li>
+        </ul>
+
+        <div class="graph-card">
+          <h3 class="sub-title" style="margin-top:0;">See it happen: play each scenario</h3>
+          <div class="scenario-picker" id="scenarioPicker">
+            <div class="scenario-chip active" data-scenario="full">Threshold reached — full action potential</div>
+            <div class="scenario-chip" data-scenario="sub">Sub-threshold stimulus — no action potential</div>
+          </div>
+          <p class="scenario-desc" id="scenarioDesc"></p>
+          <svg viewBox="0 0 520 220" width="100%" role="img" aria-label="Animated graph of axon membrane potential against time">
+            <line class="threshold-line" x1="10" y1="140" x2="510" y2="140"/>
+            <text x="14" y="132" font-size="10" fill="var(--red-text)">threshold ≈ −55 mV</text>
+            <line class="rest-line" x1="10" y1="170" x2="510" y2="170"/>
+            <text x="14" y="185" font-size="10" fill="var(--text-faint)">resting ≈ −70 mV</text>
+            <text x="14" y="30" font-size="10" fill="var(--text-faint)">peak ≈ +40 mV</text>
+            <polyline id="graphLine" points="0,170 60,170 90,145 100,130 115,60 125,20 140,60 160,140 180,185 200,192 230,180 260,170 500,170"/>
+          </svg>
+          <div class="btn-row" style="margin-top:8px;margin-bottom:0;">
+            <button class="btn primary" id="playGraph">▶ Play animation</button>
+          </div>
+        </div>
+
+        <details class="toggle flag" open>
+          <summary><span class="caret">▶</span> 🚩 The "channels, not pumps" rule</summary>
+          <div class="body">
+            <p>Active transport is explicitly rejected for both depolarisation and repolarisation — both are channel-driven facilitated diffusion. "The sodium–potassium pump causes depolarisation/repolarisation" scores nothing at this stage; the pump's role is restricted to establishing and restoring the resting potential between impulses, never to the spike itself.</p>
+          </div>
+        </details>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 4 ================= -->
+      <section class="spec-section" id="s4">
+        <div class="sec-eyebrow">Section 4 · spec content point</div>
+        <h2 class="sec-title"><span class="icon">🎚️</span> The all-or-nothing principle</h2>
+        <p class="lede">Size is fixed once threshold is crossed — every action potential in a given neurone looks identical. Intensity is coded a completely different way.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "Changes in membrane permeability lead to depolarisation and the generation of an action potential. The all-or-nothing principle." (Same specification content point as Section 3 — this half covers the all-or-nothing principle specifically.)</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s4">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s4" data-level="1" style="display:none;">
+          <p>A gun either fires or it doesn't — you can't half-pull the trigger and get a smaller bang. Push a neurone hard enough and it fires a full, identical impulse every time; push it too gently and absolutely nothing happens. Want to send a "louder" message? You don't fire a bigger bang — you just pull the trigger more times, more quickly.</p>
+        </div>
+        <div class="level-block" data-group="s4" data-level="2" style="display:none;">
+          <p>Below threshold, a stimulus produces no action potential at all — not a smaller one. At or above threshold, every action potential produced is identical in size and shape. So how does the body signal "stronger" versus "weaker"? Not by the size of any individual impulse, which can't vary once triggered, but by how often action potentials fire (their frequency) and/or how many neurones are firing at once.</p>
+        </div>
+        <div class="level-block" data-group="s4" data-level="3">
+        <ul class="tidy">
+          <li>A stimulus below threshold produces no action potential at all — not a smaller one.</li>
+          <li>A stimulus at or above threshold always produces an action potential of the same size (same peak, same shape).</li>
+          <li>Stimulus strength is coded by the <strong>frequency</strong> of action potentials (more impulses per second) and/or the <strong>number of neurones firing</strong> — never by the size of any individual action potential, which cannot vary once triggered.</li>
+        </ul>
+
+        <details class="toggle flag">
+          <summary><span class="caret">▶</span> 🚩 Trap — "a smaller action potential"</summary>
+          <div class="body">
+            <p>A sub-threshold stimulus does not produce "a smaller action potential" — it produces <strong>no impulse at all</strong>. The all-or-nothing graph above shows exactly this: the sub-threshold trace returns to resting without ever spiking.</p>
+          </div>
+        </details>
+
+        <h3 class="sub-title">Applying it to an unfamiliar drug or toxin</h3>
+        <p>A recurring exam format describes a novel drug or toxin that keeps sodium channels open (rather than closing normally), and asks for the consequence, or for an explanation of resistance to it.</p>
+        <table class="compare">
+          <tr><th>Question angle</th><th>Reasoning to apply</th></tr>
+          <tr><td>Consequence of Na⁺ channels stuck open</td><td>Na⁺ keeps entering, so the membrane cannot repolarise/return to resting — a further action potential cannot be generated normally</td></tr>
+          <tr><td>Explaining resistance to the drug</td><td>A changed channel-protein shape/tertiary structure means the drug can no longer bind — complementary-shape reasoning, reused from enzyme/receptor topics</td></tr>
+        </table>
+
+        <details class="toggle">
+          <summary><span class="caret">▶</span> 🧪 Try one yourself — click to reveal the reasoning</summary>
+          <div class="body">
+            <p><strong>Scenario:</strong> a newly isolated marine toxin locks voltage-gated sodium channels permanently open once triggered. Predict the effect on the axon.</p>
+            <p><strong>Reasoning:</strong> sodium ions continue to diffuse in through the open channels, so the membrane cannot repolarise back towards resting; without repolarisation the sodium channels cannot reset from their inactivated state, so no further action potential can be generated in that region — the axon effectively stops conducting impulses normally at the affected site.</p>
+          </div>
+        </details>
+
+        <details class="toggle flag">
+          <summary><span class="caret">▶</span> 🚩 Trap — restating "immune" without reasoning</summary>
+          <div class="body">
+            <p>For a resistance question, never just restate that the organism is "immune" — the reasoning must go through the <strong>changed channel-protein shape</strong> that prevents the drug binding, not simply assert resistance as a fact.</p>
+          </div>
+        </details>
+        </div>
+      
+        <div class="practice"><div class="prac-head"><span class="prac-title">&#9997;&#65039; Exam-style practice</span><span class="prac-count"><b data-prac-count>1</b> question &middot; <b data-prac-marks>2</b> marks</span></div><div class="prac-empty">No questions at this level for this section &mdash; switch to <b>Both</b> to see them all.</div><div class="prac-body"><div class="prac-group" data-level="A2"><div class="prac-stem">Figure 1 shows the changes in potential difference across the membrane of an axon during an action potential.</div><figure class="prac-fig"><img src="/notes/figures/3-6-2-1-nerve-impulses-a2-fig1.png" alt="Figure 1 shows the resting potential (A), peak of depolarisation (B), repolarisation (C) and the recovery period (D)." width="749" height="537" loading="lazy"></figure><div class="prac-q" data-marks="2"><div class="q-head"><span class="q-no">1.3</span><span class="q-marks">2 marks</span><span class="q-lvl a2">A2</span></div><div class="q-text">A stimulus twice as strong produces an action potential of exactly the same height. Explain why.</div><div class="q-space"></div><div class="ms" hidden><ol><li>Threshold has been reached</li><li>(Threshold or above) causes a maximal response / all-or-nothing principle</li></ol><div class="ms-ref">AQA mark scheme &middot; 7402/2 SAMS 04.3</div></div></div></div></div><div class="prac-foot"><button type="button" class="prac-reveal">Show mark schemes</button><div class="prac-note">Questions are original, written in the style of real AQA past-paper questions. The mark schemes are AQA&rsquo;s own marking points, from the paper noted against each answer.</div></div></div>
+      </section>
+
+      <!-- ================= SECTION 5 ================= -->
+      <section class="spec-section" id="s5">
+        <div class="sec-eyebrow">Section 5 · spec content point</div>
+        <h2 class="sec-title"><span class="icon">⚡</span> Saltatory vs continuous conduction</h2>
+        <p class="lede">Myelin doesn't speed up conduction directly — it insulates, which changes where along the axon the impulse actually has to be regenerated.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "The passage of an action potential along non-myelinated and myelinated axons, resulting in nerve impulses."</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s5">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s5" data-level="1" style="display:none;">
+          <p>On an insulated wire, the impulse can only "touch down" at the bare patches, so it effectively leapfrogs from gap to gap — quick. On a bare wire with no coating at all, the impulse has to restart at every single point along its whole length, one after another — much slower, like walking every step of a path instead of jumping between stepping stones.</p>
+        </div>
+        <div class="level-block" data-group="s5" data-level="2" style="display:none;">
+          <p>In a myelinated axon, the myelin sheath electrically insulates the membrane, so depolarisation can only happen at the nodes of Ranvier — the impulse appears to "jump" from node to node, which is called <strong>saltatory conduction</strong>. In a non-myelinated axon there's no insulation, so depolarisation has to occur along the whole length of the membrane, one adjacent point at a time — much slower, because far more of the membrane has to be depolarised in sequence.</p>
+        </div>
+        <div class="level-block" data-group="s5" data-level="3">
+        <ul class="tidy">
+          <li>In a myelinated axon, the myelin sheath gives electrical insulation, so depolarisation can only occur at the nodes of Ranvier — the action potential appears to "jump" from node to node (<strong>saltatory conduction</strong>).</li>
+          <li>In a non-myelinated axon, depolarisation occurs along the whole length of the membrane, at every adjacent point in turn — much slower.</li>
+          <li>Myelin does not speed up conduction directly — it insulates, so depolarisation is confined to the nodes and the impulse appears to jump between them, which is faster than regenerating the action potential at every point along an unmyelinated axon.</li>
+        </ul>
+
+        <div class="diagram-card">
+          <svg viewBox="0 0 700 220" width="100%" role="img" aria-label="Diagram contrasting saltatory conduction in a myelinated axon with continuous conduction in a non-myelinated axon">
+            <text x="350" y="16" text-anchor="middle" font-size="11" fill="var(--text-faint)">MYELINATED AXON — saltatory conduction (impulse jumps node to node)</text>
+            <rect x="30" y="35" width="90" height="26" rx="12" fill="var(--amber-bg)" stroke="var(--amber-line)"/>
+            <rect x="135" y="35" width="90" height="26" rx="12" fill="var(--amber-bg)" stroke="var(--amber-line)"/>
+            <rect x="240" y="35" width="90" height="26" rx="12" fill="var(--amber-bg)" stroke="var(--amber-line)"/>
+            <rect x="345" y="35" width="90" height="26" rx="12" fill="var(--amber-bg)" stroke="var(--amber-line)"/>
+            <rect x="450" y="35" width="90" height="26" rx="12" fill="var(--amber-bg)" stroke="var(--amber-line)"/>
+            <rect x="555" y="35" width="90" height="26" rx="12" fill="var(--amber-bg)" stroke="var(--amber-line)"/>
+            <line x1="15" y1="48" x2="665" y2="48" stroke="var(--text)" stroke-width="2" stroke-dasharray="0"/>
+            <rect x="122" y="41" width="11" height="14" fill="var(--bg)" stroke="var(--red-line)" stroke-width="1.3"/>
+            <rect x="227" y="41" width="11" height="14" fill="var(--bg)" stroke="var(--red-line)" stroke-width="1.3"/>
+            <rect x="332" y="41" width="11" height="14" fill="var(--bg)" stroke="var(--red-line)" stroke-width="1.3"/>
+            <rect x="437" y="41" width="11" height="14" fill="var(--bg)" stroke="var(--red-line)" stroke-width="1.3"/>
+            <rect x="542" y="41" width="11" height="14" fill="var(--bg)" stroke="var(--red-line)" stroke-width="1.3"/>
+            <path d="M128 25 Q233 5 338 25" stroke="var(--green-line)" stroke-width="1.5" fill="none" marker-end="url(#arrow1)"/>
+            <path d="M233 25 Q338 5 443 25" stroke="var(--green-line)" stroke-width="1.5" fill="none" marker-end="url(#arrow1)"/>
+            <defs><marker id="arrow1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--green-line)"/></marker></defs>
+            <text x="340" y="80" text-anchor="middle" font-size="9" fill="var(--text-dim)">→ direction of impulse travel →</text>
+            <text x="128" y="95" text-anchor="middle" font-size="8" fill="var(--red-text)">node of Ranvier</text>
+            <text x="128" y="106" text-anchor="middle" font-size="7.5" fill="var(--red-text)">(Na⁺ channels here)</text>
+
+            <text x="350" y="140" text-anchor="middle" font-size="11" fill="var(--text-faint)">NON-MYELINATED AXON — continuous conduction (regenerated at every point)</text>
+            <line x1="15" y1="170" x2="665" y2="170" stroke="var(--text)" stroke-width="2"/>
+            <g id="dots-row">
+              <circle cx="40" cy="170" r="4" fill="var(--red-line)"/><circle cx="70" cy="170" r="4" fill="var(--red-line)"/>
+              <circle cx="100" cy="170" r="4" fill="var(--red-line)"/><circle cx="130" cy="170" r="4" fill="var(--red-line)"/>
+              <circle cx="160" cy="170" r="4" fill="var(--red-line)"/><circle cx="190" cy="170" r="4" fill="var(--red-line)"/>
+              <circle cx="220" cy="170" r="4" fill="var(--red-line)"/><circle cx="250" cy="170" r="4" fill="var(--red-line)"/>
+              <circle cx="280" cy="170" r="4" fill="var(--red-line)"/><circle cx="310" cy="170" r="4" fill="var(--red-line)"/>
+              <circle cx="340" cy="170" r="4" fill="var(--red-line)"/><circle cx="370" cy="170" r="4" fill="var(--red-line)"/>
+              <circle cx="400" cy="170" r="4" fill="var(--red-line)"/><circle cx="430" cy="170" r="4" fill="var(--red-line)"/>
+              <circle cx="460" cy="170" r="4" fill="var(--red-line)"/><circle cx="490" cy="170" r="4" fill="var(--red-line)"/>
+              <circle cx="520" cy="170" r="4" fill="var(--red-line)"/><circle cx="550" cy="170" r="4" fill="var(--red-line)"/>
+              <circle cx="580" cy="170" r="4" fill="var(--red-line)"/><circle cx="610" cy="170" r="4" fill="var(--red-line)"/><circle cx="640" cy="170" r="4" fill="var(--red-line)"/>
+            </g>
+            <text x="340" y="195" text-anchor="middle" font-size="8.5" fill="var(--text-dim)">every dot = a point that must depolarise in turn — no insulation, so no jumping — SLOWER</text>
+          </svg>
+          <div class="diagram-cap">The myelin sheath electrically insulates the axon, so ion movement — and therefore depolarisation — can only occur at the nodes of Ranvier; the impulse appears to jump between them. In a non-myelinated axon, every point along the membrane must depolarise in turn.</div>
+        </div>
+
+        <h3 class="sub-title">Applying it: a demyelinating disease</h3>
+        <p>A common application context (e.g. Guillain–Barré syndrome) asks for the effect of a damaged or absent myelin sheath:</p>
+        <ul class="tidy">
+          <li>With the myelin sheath damaged or absent, saltatory conduction is <strong>reduced or lost</strong>.</li>
+          <li>Depolarisation spreads over a <strong>greater area of exposed axon membrane</strong> instead of jumping cleanly between nodes.</li>
+          <li>Conduction is <strong>slowed</strong>, and impulses may <strong>fail to reach</strong> the neuromuscular junction/target cell at all.</li>
+        </ul>
+        <p>This application format is the priority — stating the consequence of losing saltatory conduction, not just defining what saltatory conduction is.</p>
+
+        <details class="toggle flag" open>
+          <summary><span class="caret">▶</span> 🚩 Trap — "messages"/"signals", and oversimplifying demyelination</summary>
+          <div class="body">
+            <p>The "messages"/"signals" rule is applied particularly strictly on this point — always write <strong>"action potential"</strong> or <strong>"impulse"</strong>, never "messages" or "signals". Separately, a demyelinated axon does not simply "conduct slower" everywhere evenly — depolarisation spreads over a greater area of exposed membrane instead of jumping cleanly node to node, and the impulse may fail to reach the target cell entirely, not merely arrive late.</p>
+          </div>
+        </details>
+        </div>
+      
+        <div class="practice"><div class="prac-head"><span class="prac-title">&#9997;&#65039; Exam-style practice</span><span class="prac-count"><b data-prac-count>2</b> questions &middot; <b data-prac-marks>5</b> marks</span></div><div class="prac-empty">No questions at this level for this section &mdash; switch to <b>Both</b> to see them all.</div><div class="prac-body"><div class="prac-group" data-level="A2"><div class="prac-stem">Some motor neurones are myelinated and some are not.</div><div class="prac-q" data-marks="3"><div class="q-head"><span class="q-no">2.1</span><span class="q-marks">3 marks</span><span class="q-lvl a2">A2</span></div><div class="q-text">Explain why an action potential travels faster along a myelinated axon.</div><div class="q-space"></div><div class="ms" hidden><ol><li>Myelination provides (electrical) insulation</li><li>(In myelinated) saltatory (conduction) OR (in myelinated) depolarisation at nodes (of Ranvier)</li><li>In non-myelinated, depolarisation occurs along the whole / length (of the axon)</li></ol><span class="tag acc"><b>Accept / ignore.</b> Accept a description of (electrical) insulation. Accept action potentials for depolarisation.</span><span class="tag rej"><b>Reject.</b> Thermal insulation. ‘Messages’ or ‘signals’ disqualifies the first of these marks credited.</span><div class="ms-ref">AQA mark scheme &middot; 7402/2 Nov21 02.2</div></div></div><div class="prac-q" data-marks="2"><div class="q-head"><span class="q-no">2.2</span><span class="q-marks">2 marks</span><span class="q-lvl a2">A2</span></div><div class="q-text">A disease destroys the myelin sheath. Explain the effect on the speed of conduction.</div><div class="q-space"></div><div class="ms" hidden><ol><li>Less / no saltatory conduction OR action potential / impulse unable to ‘jump’ from node to node</li><li>More depolarisation over the length / area of the membranes</li></ol><div class="ms-ref">AQA mark scheme &middot; 7402/2 SAMS 04.4</div></div></div></div></div><div class="prac-foot"><button type="button" class="prac-reveal">Show mark schemes</button><div class="prac-note">Questions are original, written in the style of real AQA past-paper questions. The mark schemes are AQA&rsquo;s own marking points, from the paper noted against each answer.</div></div></div>
+      </section>
+
+      <!-- ================= SECTION 6 ================= -->
+      <section class="spec-section" id="s6">
+        <div class="sec-eyebrow">Section 6 · spec content point</div>
+        <h2 class="sec-title"><span class="icon">⏱️</span> The refractory period</h2>
+        <p class="lede">A brief, enforced pause after every action potential — not a flaw in the system, but the reason impulses stay separate and only ever travel one way.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "The nature and importance of the refractory period in producing discrete impulses and in limiting the frequency of impulse transmission."</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s6">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s6" data-level="1" style="display:none;">
+          <p>Right after a firework goes off, it needs a moment to reload before it can fire again — no matter how hard you try to set it off early, nothing happens. That's the refractory period. It's actually useful: it stops the "flame" from accidentally jumping backwards along the fuse, and it stops fireworks going off in one continuous blur — it keeps each bang separate and limits how fast they can go off in a row.</p>
+        </div>
+        <div class="level-block" data-group="s6" data-level="2" style="display:none;">
+          <p>Straight after an action potential fires, that stretch of membrane has an <strong>absolute refractory period</strong>, where the sodium channels are locked shut and simply cannot reopen, however strong a new stimulus is. As the membrane then hyperpolarises, there's a <strong>relative refractory period</strong>, where a new action potential is still possible, but only from an unusually strong stimulus, because the membrane is further from threshold than normal. Together these do two jobs: they force the impulse to travel in one direction only, and they set a hard limit on how close together, and how frequent, impulses can be.</p>
+        </div>
+        <div class="level-block" data-group="s6" data-level="3">
+        <h3 class="sub-title">Nature of the refractory period</h3>
+        <ul class="tidy">
+          <li><strong>Absolute refractory period:</strong> immediately after an action potential, voltage-gated sodium channels are closed/inactivated and cannot reopen, whatever the stimulus strength.</li>
+          <li><strong>Relative refractory period:</strong> during the later hyperpolarisation/undershoot, the membrane is further from threshold, so only an unusually strong stimulus can trigger a new action potential.</li>
+          <li>Throughout, the membrane cannot be re-depolarised normally.</li>
+        </ul>
+
+        <h3 class="sub-title">Its importance — two separate functions</h3>
+        <ol class="steps">
+          <li>Ensures impulses travel in <strong>one direction only</strong> (unidirectional) — the section of membrane that has just fired cannot immediately re-fire, so the impulse cannot travel backwards into it.</li>
+          <li>Produces <strong>discrete</strong> (separate, non-merging) impulses and limits the <strong>maximum frequency</strong> of impulse transmission, by fixing a minimum time between successive action potentials.</li>
+        </ol>
+
+        <details class="toggle flag">
+          <summary><span class="caret">▶</span> 🚩 Trap — stating only one function</summary>
+          <div class="body">
+            <p>Both functions need to be stated for full credit — "prevents too many impulses" alone is not the same as separately stating <strong>discreteness</strong> and <strong>unidirectionality</strong> as two distinct points.</p>
+          </div>
+        </details>
+
+        <h3 class="sub-title">Calculating a maximum impulse frequency</h3>
+        <div class="callout note">
+          <div class="ic">📐</div>
+          <div><p><strong>Method:</strong> maximum frequency (impulses s⁻¹, i.e. Hz) = 1 ÷ refractory period (in seconds).</p></div>
+        </div>
+        <div class="callout tip">
+          <div class="ic">✅</div>
+          <div><p><strong>Worked example:</strong> a neurone has a refractory period of 2 ms. Convert to seconds: 2 ÷ 1000 = 0.002 s. Maximum frequency = 1 ÷ 0.002 = <strong>500 impulses per second (500 Hz)</strong>.</p></div>
+        </div>
+
+        <details class="toggle flag">
+          <summary><span class="caret">▶</span> 🚩 Trap — unit conversion and rounding</summary>
+          <div class="body">
+            <p>The recurring traps in this calculation are the ms → s unit conversion (dividing by 1000 incorrectly, or forgetting it altogether) and standard-form rounding — give a final answer to an appropriate number of significant figures, not an unrounded calculator display. Also worth remembering: once the maximum frequency is reached or exceeded, there's no further increase in the information a neurone can transmit — every stronger stimulus beyond that point looks the same to the next cell in the pathway.</p>
+          </div>
+        </details>
+        </div>
+      
+        <div class="practice"><div class="prac-head"><span class="prac-title">&#9997;&#65039; Exam-style practice</span><span class="prac-count"><b data-prac-count>1</b> question &middot; <b data-prac-marks>2</b> marks</span></div><div class="prac-empty">No questions at this level for this section &mdash; switch to <b>Both</b> to see them all.</div><div class="prac-body"><div class="prac-group" data-level="A2"><div class="prac-stem">Figure 1 shows the changes in potential difference across the membrane of an axon during an action potential.</div><figure class="prac-fig"><img src="/notes/figures/3-6-2-1-nerve-impulses-a2-fig1.png" alt="Figure 1 shows the resting potential (A), peak of depolarisation (B), repolarisation (C) and the recovery period (D)." width="749" height="537" loading="lazy"></figure><div class="prac-q" data-marks="2"><div class="q-head"><span class="q-no">1.4</span><span class="q-marks">2 marks</span><span class="q-lvl a2">A2</span></div><div class="q-text">Explain the importance of the period labelled D.</div><div class="q-space"></div><div class="ms" hidden><ol><li>It is the refractory period, during which no further action potential can be generated</li><li>This ensures action potentials are discrete / unidirectional and limits their frequency</li></ol><div class="ms-ref">AQA mark scheme &middot; spec statement</div></div></div></div></div><div class="prac-foot"><button type="button" class="prac-reveal">Show mark schemes</button><div class="prac-note">Questions are original, written in the style of real AQA past-paper questions. The mark schemes are AQA&rsquo;s own marking points, from the paper noted against each answer.</div></div></div>
+      </section>
+
+      <!-- ================= SECTION 7 ================= -->
+      <section class="spec-section" id="s7">
+        <div class="sec-eyebrow">Section 7 · spec content point</div>
+        <h2 class="sec-title"><span class="icon">🌡️</span> Factors affecting the speed of conductance</h2>
+        <p class="lede">Three separate factors, each with its own mechanism — describing only the effect ("faster" or "slower") without the reason behind it leaves marks on the table.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "Factors affecting the speed of conductance: myelination and saltatory conduction; axon diameter; temperature."</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s7">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s7" data-level="1" style="display:none;">
+          <p>Three things make a nerve "wire" carry its signal faster: wrapping it in insulation (so it can jump between bare patches instead of firing all the way along), making the wire fatter (less charge leaks out of a fat wire), and warming it up a bit (warm parts jiggle and react faster) — but only up to a point, because too much heat wrecks the proteins doing the work.</p>
+        </div>
+        <div class="level-block" data-group="s7" data-level="2" style="display:none;">
+          <p>Myelination speeds things up because it forces the impulse to jump between nodes of Ranvier instead of firing along the whole membrane — saltatory conduction. A wider axon is faster too, because it has proportionally less surface area for its volume, so less ion leakage and less resistance to ions flowing along inside it. Warmer temperatures speed things up because ions and channel proteins have more kinetic energy, meaning faster diffusion and faster channel opening — but only up to about 40°C, above which the channel and pump proteins start to denature and speed drops sharply.</p>
+        </div>
+        <div class="level-block" data-group="s7" data-level="3">
+        <table class="compare">
+          <tr><th>Factor</th><th>Mechanism</th></tr>
+          <tr><td><strong>Myelination</strong></td><td>Saltatory conduction — electrical insulation confines depolarisation to the nodes of Ranvier, so the impulse jumps rather than being regenerated at every point.</td></tr>
+          <tr><td><strong>Axon diameter</strong></td><td>A wider axon has a smaller surface area to volume ratio, so proportionally less ion leakage out across the membrane, and less resistance to the flow of ions along the inside of the axon — both make conduction faster.</td></tr>
+          <tr><td><strong>Temperature</strong></td><td>Higher temperature gives ions/channel proteins more kinetic energy, so faster diffusion and faster channel gating (and more ATP available for the pump) — up to about 40°C, above which channel and pump proteins denature and speed falls sharply.</td></tr>
+        </table>
+
+        <h3 class="sub-title">Evaluating experimental or disease data on myelin</h3>
+        <p>A common application here presents data comparing a demyelinated/disease group with a healthy control group, and asks whether the difference is meaningful:</p>
+        <ul class="tidy">
+          <li>Judge whether a difference between groups is significant using <strong>error bars</strong> — overlapping bars suggest the difference may not be significant; non-overlapping bars suggest it may be.</li>
+          <li>Identify possible <strong>confounding variables</strong> or a <strong>small sample size</strong> that limits the conclusion that can be drawn — the condition could involve other factors besides reduced myelin, or the difference between forms of the condition could itself be large.</li>
+        </ul>
+
+        <h3 class="sub-title">Writing a statistically rigorous conclusion</h3>
+        <div class="callout tip">
+          <div class="ic">✅</div>
+          <div><p>Correct form: <em>"the probability of this difference occurring by chance is less than 5%, so the difference is significant."</em> Both the reference to probability and the specific claim that the <strong>difference</strong> (not just "the results") is significant are needed.</p></div>
+        </div>
+
+        <details class="toggle flag">
+          <summary><span class="caret">▶</span> 🚩 Trap — "the results are significant"</summary>
+          <div class="body">
+            <p>"The results are significant" alone, with no reference to probability/chance, is not accepted as a full statistical conclusion — and it's the <strong>difference</strong> between groups that is significant, not "the results" as a whole.</p>
+          </div>
+        </details>
+        </div>
+      
+        <div class="practice"><div class="prac-head"><span class="prac-title">&#9997;&#65039; Exam-style practice</span><span class="prac-count"><b data-prac-count>1</b> question &middot; <b data-prac-marks>2</b> marks</span></div><div class="prac-empty">No questions at this level for this section &mdash; switch to <b>Both</b> to see them all.</div><div class="prac-body"><div class="prac-group" data-level="A2"><div class="prac-stem">Some motor neurones are myelinated and some are not.</div><div class="prac-q" data-marks="2"><div class="q-head"><span class="q-no">2.3</span><span class="q-marks">2 marks</span><span class="q-lvl a2">A2</span></div><div class="q-text">Give two other factors that affect the speed of conduction along an axon, and state the effect of each.</div><div class="q-space"></div><div class="ms" hidden><ol><li>Larger axon diameter — faster conduction (less resistance to the flow of ions)</li><li>Higher temperature — faster conduction, because ions diffuse faster and the sodium–potassium pump works faster (up to the point of denaturation)</li></ol><div class="ms-ref">AQA mark scheme &middot; spec statement</div></div></div></div></div><div class="prac-foot"><button type="button" class="prac-reveal">Show mark schemes</button><div class="prac-note">Questions are original, written in the style of real AQA past-paper questions. The mark schemes are AQA&rsquo;s own marking points, from the paper noted against each answer.</div></div></div>
+      </section>
+
+      <!-- ================= SECTION 8 (bonus) ================= -->
+      <section class="spec-section" id="s8">
+        <div class="sec-eyebrow">Section 8 · exam technique</div>
+        <h2 class="sec-title"><span class="icon">🎯</span> Common mistakes &amp; precise wording</h2>
+        <p class="lede">This spec point is testable at high difficulty less because the biology is conceptually hard, and more because so much of it rides on exact terminology. These are the slips that come up again and again.</p>
+
+        <table class="compare">
+          <tr><th>Vague or incorrect version</th><th>What to say instead</th></tr>
+          <tr><td>"The myelin sheath keeps the axon warm" / "thermal insulation"</td><td>The myelin sheath gives <strong>electrical</strong> insulation</td></tr>
+          <tr><td>Two or three resting-potential points with no mention of ions</td><td>Say "ions" explicitly, and keep the permeability difference and the pump as two separate points</td></tr>
+          <tr><td>"The sodium–potassium pump causes depolarisation/repolarisation"</td><td>Both are channel-driven facilitated diffusion — the pump is never the cause of the spike itself</td></tr>
+          <tr><td>"A weaker stimulus makes a smaller action potential"</td><td>Below threshold: no action potential at all. At/above threshold: always the same size — intensity is coded by frequency</td></tr>
+          <tr><td>"Messages" or "signals" travelling along a neurone</td><td>Use "impulses" or "action potential" instead</td></tr>
+          <tr><td>"A demyelinated axon just conducts slower everywhere"</td><td>Depolarisation spreads over a greater area of exposed membrane, and the impulse may fail to arrive at all — not simply arrive late</td></tr>
+          <tr><td>Stating only one function of the refractory period</td><td>State both: unidirectional travel <em>and</em> discrete, frequency-limited impulses</td></tr>
+          <tr><td>Refractory-period calculation left in milliseconds, or unrounded</td><td>Convert ms → s first, then round the final answer to an appropriate number of significant figures</td></tr>
+          <tr><td>"The results are significant" for myelin/disease data</td><td>State the probability is less than 5% (or similar) and that the <strong>difference</strong> is significant</td></tr>
+        </table>
+
+        <details class="toggle">
+          <summary><span class="caret">▶</span> Where this point sits in difficulty terms</summary>
+          <div class="body">
+            <p>This is entirely second-year-level content: a labelled structure, a three-part resting-potential mechanism, two channel-based sequences for depolarisation/repolarisation, saltatory vs continuous conduction, a two-function refractory period, and three speed factors — a genuinely high memorisation load. On top of that, unfamiliar drug/toxin and demyelinating-disease application questions both require reasoning the mechanism onto new information rather than reciting it, and terminology precision (the compulsory "ions" wording, "messages/signals" vs "action potential/impulse", "electrical" vs "thermal" insulation) is checked closely throughout. Depolarisation and repolarisation tend to be described well on their own, but many answers under-detail how the resting potential is established and maintained, and fewer answers than expected explain clearly why saltatory conduction is actually faster, with explicit reference to the nodes of Ranvier.</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- ================= SECTION 9 (bonus) ================= -->
+      <section class="spec-section" id="s9">
+        <div class="sec-eyebrow">Section 9 · exam technique</div>
+        <h2 class="sec-title"><span class="icon">✍️</span> Using this in longer written answers</h2>
+        <p class="lede">This content works well as a supporting paragraph inside a longer essay-style answer on more than one theme — the trick is closing each paragraph with a sentence that ties the mechanism back to whatever the title is actually about, rather than repeating a generic summary.</p>
+
+        <details class="toggle">
+          <summary><span class="caret">▶</span> Example paragraph — angled around "movement in living organisms"</summary>
+          <div class="body">
+            <p>The resting potential is established by differential membrane permeability together with active transport of Na⁺ out and K⁺ in by the sodium–potassium pump. Depolarisation follows when voltage-gated sodium channels open and Na⁺ diffuses in — ion movement through channel proteins, never pumps — making the inside of the axon less negative; repolarisation then follows as potassium channels open and K⁺ diffuses out. In a myelinated axon, saltatory conduction means depolarisation only occurs at the nodes of Ranvier, so the action potential appears to "jump" and travels faster as a result. Link to title: the impulse itself is fundamentally a wave of ion movement along the axon, and it is this movement that ultimately triggers muscle contraction — connecting molecular-scale movement directly to whole-organism movement.</p>
+          </div>
+        </details>
+        <details class="toggle">
+          <summary><span class="caret">▶</span> Example paragraph — angled around "diffusion in organisms"</summary>
+          <div class="body">
+            <p>The nerve impulse itself is generated by the diffusion of ions through channel proteins — sodium ions diffusing in during depolarisation, potassium ions diffusing out during repolarisation, both down their electrochemical gradients and both entirely independent of active transport. This shows diffusion operating even in fast electrical signalling, not just in slower processes like gas exchange: the speed of an axon's response depends on how quickly ions can diffuse through open channels, and factors like temperature and myelination change that speed by changing how, and where, that diffusion happens.</p>
+          </div>
+        </details>
+
+        <p class="lede" style="margin-top:6px;">Whichever essay theme this content is used for, treat it as the "mechanism" paragraph: state the process precisely — naming the specific channels, ions and structures involved — then add one sentence linking it explicitly back to that theme, in the essay's own vocabulary.</p>
+      </section>
+
+      <!-- ================= SECTION 10 (bonus) ================= -->
+      <section class="spec-section" id="s10">
+        <div class="sec-eyebrow">Section 10</div>
+        <h2 class="sec-title"><span class="icon">🧷</span> Where this fits in the course, memory hook &amp; checklist</h2>
+
+        <h3 class="sub-title">Where 3.6.2.1 reappears across the rest of the specification</h3>
+        <ul class="tidy">
+          <li><strong>3.6.1.2 Receptors</strong> — generator potentials use the same threshold-and-voltage-gated-channel logic before an action potential is triggered.</li>
+          <li><strong>3.6.2.2 Synaptic transmission</strong> — depolarisation of the presynaptic membrane opens voltage-gated calcium channels, the same channel-gating vocabulary, now triggering vesicle fusion.</li>
+          <li><strong>3.6.3 Skeletal muscles</strong> — the neuromuscular junction depends on an action potential arriving successfully, which depends on saltatory/continuous conduction from this page.</li>
+          <li><strong>3.6.1.3 Control of heart rate and 3.6.4 Homeostasis</strong> — nervous coordination described using the same "impulse", never "signal", vocabulary.</li>
+          <li><strong>3.2.1–3.2.2 Membrane structure and transport</strong> — the facilitated diffusion/active transport distinction this whole page depends on.</li>
+        </ul>
+        <p>Rule of thumb: any question anywhere in the course about a neurone, a synapse, or nervous (as opposed to hormonal) coordination is, underneath, still testing the channel-vs-pump mechanism and the exact vocabulary built on this page.</p>
+
+        <div class="callout note">
+          <div class="ic">🧠</div>
+          <div><p><strong>Memory hook.</strong> Channels move it, the pump resets it. Depolarisation and repolarisation are both channel-driven facilitated diffusion — Na⁺ in, then K⁺ out — never the pump. The pump's job is different: alongside the K⁺ leak channels, it establishes and restores the resting potential between impulses. Threshold is the switch: below it, nothing fires; at or above it, every action potential is identical, and intensity is coded by frequency, not size. Myelin doesn't speed the impulse up directly — it insulates, so the impulse only needs to fire at the nodes of Ranvier and appears to jump between them.</p></div>
+        </div>
+
+        <h3 class="sub-title">Quick numbers worth having ready</h3>
+        <table class="compare">
+          <tr><th>Quantity</th><th>Typical value / relationship</th></tr>
+          <tr><td>Resting potential</td><td>≈ −70 mV (inside negative relative to outside)</td></tr>
+          <tr><td>Threshold</td><td>≈ −55 mV — must be reached for voltage-gated Na⁺ channels to open</td></tr>
+          <tr><td>Peak of the action potential</td><td>≈ +40 mV (an overshoot past 0 mV)</td></tr>
+          <tr><td>Sodium–potassium pump ratio</td><td>3 Na⁺ out : 2 K⁺ in, per cycle, using ATP</td></tr>
+          <tr><td>Maximum impulse frequency</td><td>1 ÷ refractory period (in seconds) — convert ms to s first</td></tr>
+          <tr><td>Upper temperature limit for speed</td><td>≈ 40°C — conduction speeds up below this, then falls as proteins denature</td></tr>
+        </table>
+        <p class="lede">These are safe orders of magnitude for sense-checking a graph-reading or calculation answer, not values to quote unprompted — always read the actual figures given in a question's data.</p>
+
+        <h3 class="sub-title">Self-check before moving on</h3>
+        <ul class="checklist" id="finalChecklist">
+          <li><input type="checkbox"><span>I can name and give the function of every structure in a myelinated motor neurone (cell body, dendrites, axon, Schwann cells, myelin sheath, nodes of Ranvier).</span></li>
+          <li><input type="checkbox"><span>I can explain the resting potential using "ions" explicitly at every step, keeping the permeability difference and the sodium–potassium pump as two separate, clearly stated points.</span></li>
+          <li><input type="checkbox"><span>I can explain depolarisation and repolarisation using only channel proteins (voltage-gated Na⁺, then voltage-gated K⁺) and never the pump, and I can explain why hyperpolarisation/undershoot happens.</span></li>
+          <li><input type="checkbox"><span>I can state the all-or-nothing principle correctly: no action potential below threshold, identical action potentials above it, intensity coded by frequency and/or number of neurones firing.</span></li>
+          <li><input type="checkbox"><span>I can explain saltatory conduction with explicit reference to the nodes of Ranvier and electrical (never thermal) insulation, and apply it to a demyelinating-disease scenario.</span></li>
+          <li><input type="checkbox"><span>I can state the refractory period's nature and both of its functions (unidirectional travel; discrete, frequency-limited impulses), and calculate a maximum impulse frequency correctly, in Hz, from a refractory period given in milliseconds.</span></li>
+          <li><input type="checkbox"><span>I can explain all three factors affecting conduction speed (myelination, axon diameter, temperature) with a mechanism, and write a statistically rigorous conclusion for myelin/disease data.</span></li>
+        </ul>
+      </section>
+
+      <footer class="page-footer">A study tool built from your own revision material, reworded throughout into original notes. Everything on this page runs locally in your browser and nothing is saved when you close the tab.</footer>
+    </div>
+
+    <!-- ============ CRAM VIEW ============ -->
+    <div id="cramView" class="tool-panel" style="display:none;">
+      <div class="tool-header"><span style="font-size:26px;">⚡</span><div><h1 class="page-title" style="font-size:26px;margin-bottom:2px;">5-Minute Cram</h1></div></div>
+      <p class="tool-sub">Every spec content point, cut down to the facts that carry the most marks. Read this the night before, or right before you walk in.</p>
+
+      <div class="cram-point">
+        <h3>1 · Neurone structure</h3>
+        <ul>
+          <li>Know these by <strong>name + function</strong>: cell body, dendrites, axon, Schwann cells, myelin sheath, nodes of Ranvier.</li>
+          <li>Myelin sheath = <strong>electrical</strong> insulation, never thermal.</li>
+          <li>Nodes of Ranvier = the only place voltage-gated Na⁺ channels are concentrated / depolarisation can occur in a myelinated axon.</li>
+        </ul>
+      </div>
+      <div class="cram-point">
+        <h3>2 · The resting potential</h3>
+        <ul>
+          <li>K⁺ higher inside, Na⁺ higher outside — concentration gradients.</li>
+          <li>Membrane more permeable to K⁺ than Na⁺ (leak channels) → K⁺ diffuses out faster than Na⁺ in.</li>
+          <li>Na⁺/K⁺ pump: 3 Na⁺ out, 2 K⁺ in, using ATP, against gradients.</li>
+          <li>Result: ≈ −70 mV, inside negative. Must say "ions" explicitly, or capped at 1 mark.</li>
+        </ul>
+      </div>
+      <div class="cram-point">
+        <h3>3 · Depolarisation &amp; the action potential</h3>
+        <ul>
+          <li>Threshold ≈ −55 mV → voltage-gated Na⁺ channels open → Na⁺ in (facilitated diffusion) → peak ≈ +40 mV.</li>
+          <li>Na⁺ channels close, K⁺ channels open → K⁺ out → repolarisation.</li>
+          <li>K⁺ channels slow to close → hyperpolarisation (undershoot) → resting restored.</li>
+          <li><strong>Never the pump</strong> for either step — channels only.</li>
+        </ul>
+      </div>
+      <div class="cram-point">
+        <h3>4 · All-or-nothing principle</h3>
+        <ul>
+          <li>Below threshold: no action potential at all. At/above threshold: always identical size.</li>
+          <li>Intensity = coded by <strong>frequency</strong> of impulses and/or number of neurones firing.</li>
+          <li>Drug locks Na⁺ channels open → can't repolarise → no further AP. Resistance = changed channel-protein shape, drug can't bind.</li>
+        </ul>
+      </div>
+      <div class="cram-point">
+        <h3>5 · Saltatory vs continuous conduction</h3>
+        <ul>
+          <li>Myelinated: depolarisation only at nodes of Ranvier → impulse "jumps" (saltatory conduction) → faster.</li>
+          <li>Non-myelinated: depolarises along whole length, point by point → slower.</li>
+          <li>Demyelination → saltatory conduction reduced/lost → depolarisation spreads over more membrane → slowed, may fail to arrive.</li>
+          <li>Always "impulse"/"action potential" — never "message"/"signal".</li>
+        </ul>
+      </div>
+      <div class="cram-point">
+        <h3>6 · The refractory period</h3>
+        <ul>
+          <li>Absolute: Na⁺ channels inactivated, can't reopen whatever the stimulus.</li>
+          <li>Relative: during hyperpolarisation, only a strong stimulus can trigger a new AP.</li>
+          <li>Two functions: unidirectional travel + discrete, frequency-limited impulses — state both.</li>
+          <li>Max frequency (Hz) = 1 ÷ refractory period (s). Convert ms→s first; round sensibly.</li>
+        </ul>
+      </div>
+      <div class="cram-point">
+        <h3>7 · Factors affecting speed</h3>
+        <ul>
+          <li>Myelination → saltatory conduction (see 5).</li>
+          <li>Wider axon → smaller SA:V ratio → less ion leakage, less resistance → faster.</li>
+          <li>Higher temperature → more kinetic energy → faster diffusion/gating — up to ≈40°C, then proteins denature and speed falls.</li>
+          <li>Stats conclusion: "probability of this difference by chance is &lt;5%, so the difference is significant" — not just "the results are significant."</li>
+        </ul>
+      </div>
+      <div class="callout note">
+        <div class="ic">🧠</div>
+        <div><p><strong>Channels move it, the pump resets it.</strong> Na⁺ in (depolarisation), K⁺ out (repolarisation) — both channels, never the pump. Threshold is the switch: nothing below it, identical above it, intensity by frequency. Myelin insulates, so the impulse jumps node to node instead of firing all along the axon.</p></div>
+      </div>
+    </div>
+
+    <!-- ============ DRILL VIEW (markscheme-wording Q&A) ============ -->
+    <div id="drillView" class="tool-panel" style="display:none;">
+      <div class="tool-header"><span style="font-size:26px;">🎯</span><div><h1 class="page-title" style="font-size:26px;margin-bottom:2px;">Markscheme-Wording Drill</h1></div></div>
+      <p class="tool-sub">Invented prompts, written in the style of how this spec point actually gets tested — not real past-paper questions. Click a question to reveal a model answer written in the precise wording that earns full marks, then try saying it back in your own words before you check.</p>
+
+      <div class="drill-group">
+        <h3>Neurone structure</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ Label the parts of a myelinated motor neurone shown in an unfamiliar diagram, giving the function of each structure you name.</div>
+          <div class="qa-a">Cell body — contains the nucleus and organelles, synthesises proteins and keeps the cell alive. Dendrites — carry impulses towards the cell body. Axon — carries the action potential away from the cell body towards the effector. Schwann cells — wrap around the axon in segments, forming the myelin sheath. Myelin sheath — electrically insulates the axon membrane. Nodes of Ranvier — gaps where the axon membrane is exposed and voltage-gated Na⁺ channels are concentrated; the only place depolarisation can occur in a myelinated axon.</div>
+          <div class="qa-q">❓ A student describes the myelin sheath as providing "thermal insulation, keeping the axon warm." Correct this statement.</div>
+          <div class="qa-a">The myelin sheath provides electrical, not thermal, insulation — it prevents ion movement across the axon membrane except at the nodes of Ranvier; it has no role in regulating the axon's temperature.</div>
+        </div>
+      </div>
+
+      <div class="drill-group">
+        <h3>The resting potential</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ Explain how a resting potential of about −70 mV is established and maintained in a neurone.</div>
+          <div class="qa-a">Potassium ion concentration is higher inside the axon and sodium ion concentration is higher outside it; the membrane is more permeable to potassium ions than to sodium ions, via potassium leak channels, so potassium ions diffuse out faster than sodium ions diffuse in; the sodium–potassium pump actively transports 3 sodium ions out for every 2 potassium ions in, using ATP, against their concentration gradients. Together, the permeability difference and the pump leave the inside of the axon negative relative to the outside.</div>
+          <div class="qa-q">❓ A student writes: "the sodium–potassium pump maintains the resting potential." Explain why this answer alone would not gain full credit.</div>
+          <div class="qa-a">It fails to reference the differential permeability of the membrane to sodium and potassium ions (via leak channels) as a separate mechanism, and merges the pump and the permeability difference into one vague statement rather than crediting both as distinct points; it should also state explicitly that 3 sodium ions are pumped out for every 2 potassium ions in.</div>
+          <div class="qa-q">❓ Give the direction of net ion movement for both sodium and potassium ions as a neurone's resting potential is being established.</div>
+          <div class="qa-a">Potassium ions move out of the axon (down their concentration gradient, via leak channels, faster than sodium moves in); sodium ions move out of the axon against their concentration gradient by active transport via the sodium–potassium pump — leaving a higher concentration of sodium ions outside and potassium ions inside at rest.</div>
+        </div>
+      </div>
+
+      <div class="drill-group">
+        <h3>Depolarisation &amp; the action potential</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ Explain what happens at the axon membrane during depolarisation and repolarisation.</div>
+          <div class="qa-a">Depolarisation: a stimulus reaching threshold (≈−55 mV) causes voltage-gated sodium channels to open; sodium ions diffuse in down their electrochemical gradient by facilitated diffusion, making the membrane less negative then positive, with more channels opening as a result (positive feedback) up to about +40 mV. Repolarisation: at the peak, voltage-gated sodium channels close and voltage-gated potassium channels open; potassium ions diffuse out down their electrochemical gradient, bringing the membrane potential back towards resting.</div>
+          <div class="qa-q">❓ Explain why hyperpolarisation occurs after an action potential.</div>
+          <div class="qa-a">Voltage-gated potassium channels are slightly slow to close, so slightly too much potassium diffuses out of the axon before they shut; this takes the membrane potential briefly below the normal resting potential (an undershoot) before the sodium–potassium pump and potassium leak channels restore it.</div>
+          <div class="qa-q">❓ A student writes: "the sodium–potassium pump causes depolarisation." Explain why this is incorrect.</div>
+          <div class="qa-a">Depolarisation is caused by voltage-gated sodium channels opening and sodium ions diffusing in by facilitated diffusion — a passive process through channel proteins; the sodium–potassium pump uses active transport and plays no part in causing depolarisation or repolarisation, only in restoring the resting potential afterwards.</div>
+        </div>
+      </div>
+
+      <div class="drill-group">
+        <h3>All-or-nothing principle</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ State the all-or-nothing principle and explain how the nervous system codes for stimulus intensity.</div>
+          <div class="qa-a">A stimulus below threshold produces no action potential at all; a stimulus at or above threshold always produces an action potential of the same size and shape. Stimulus intensity is coded by the frequency of action potentials produced and/or the number of neurones firing, not by the size of any individual action potential.</div>
+          <div class="qa-q">❓ A newly discovered toxin is found to keep voltage-gated sodium channels permanently open once triggered. Predict and explain the effect on the axon.</div>
+          <div class="qa-a">Sodium ions continue to diffuse into the axon, so the membrane cannot repolarise back towards its resting potential; because the sodium channels cannot reset from their inactivated state without repolarisation, no further action potential can be generated in that region of the axon.</div>
+          <div class="qa-q">❓ A second population of the same organism is found to be resistant to this toxin. Suggest an explanation.</div>
+          <div class="qa-a">A mutation has changed the tertiary structure/shape of the sodium ion channel protein, so it is no longer complementary to the toxin; the toxin can no longer bind to the channel, so it cannot hold it open.</div>
+        </div>
+      </div>
+
+      <div class="drill-group">
+        <h3>Saltatory vs continuous conduction</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ Contrast the passage of an action potential along a myelinated axon with a non-myelinated axon.</div>
+          <div class="qa-a">In a myelinated axon, the myelin sheath electrically insulates the membrane, so depolarisation can only occur at the nodes of Ranvier; the action potential appears to jump from node to node — saltatory conduction. In a non-myelinated axon there is no insulation, so depolarisation occurs along the whole length of the membrane, at every adjacent point in turn; this is slower because far more of the membrane must be depolarised in sequence.</div>
+          <div class="qa-q">❓ A patient with a demyelinating disease is found to have slower nerve conduction than normal. Explain why.</div>
+          <div class="qa-a">With the myelin sheath damaged, saltatory conduction is reduced or lost; depolarisation spreads over a greater area of exposed axon membrane instead of jumping cleanly between nodes; conduction is slowed, and impulses may fail to reach the target cell (e.g. the neuromuscular junction) at all.</div>
+        </div>
+      </div>
+
+      <div class="drill-group">
+        <h3>The refractory period</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ State the nature of the refractory period and explain its importance.</div>
+          <div class="qa-a">Immediately after an action potential, voltage-gated sodium channels are closed/inactivated (absolute refractory period) and cannot reopen whatever the stimulus strength; during the later hyperpolarisation, only an unusually strong stimulus can trigger a new action potential (relative refractory period). It ensures impulses travel in one direction only, since the region that has just fired cannot immediately re-fire, and it produces discrete impulses while limiting the maximum frequency of transmission.</div>
+          <div class="qa-q">❓ A neurone has a refractory period of 4 ms. Calculate its maximum impulse frequency, giving appropriate units.</div>
+          <div class="qa-a">4 ms = 4 ÷ 1000 = 0.004 s. Maximum frequency = 1 ÷ 0.004 = 250 impulses per second (250 Hz).</div>
+        </div>
+      </div>
+
+      <div class="drill-group">
+        <h3>Factors affecting speed</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ Explain why a wider axon conducts impulses faster than a narrower one.</div>
+          <div class="qa-a">A wider axon has a smaller surface area to volume ratio, so proportionally less ion leakage occurs across the membrane and there is less resistance to the flow of ions along the inside of the axon; both of these allow depolarisation to spread, and threshold to be reached, more quickly along the axon.</div>
+          <div class="qa-q">❓ Explain why conduction speed increases with temperature up to about 40°C, but then falls sharply.</div>
+          <div class="qa-a">Higher temperature gives ions and channel proteins more kinetic energy, so ions diffuse faster and channels open and close faster, and more ATP is available for the sodium–potassium pump; above about 40°C, channel and pump proteins begin to denature, so conduction speed falls sharply.</div>
+          <div class="qa-q">❓ Data comparing a demyelinated group with a healthy control group shows non-overlapping error bars. Write a fully rigorous conclusion.</div>
+          <div class="qa-a">The probability of this difference between the demyelinated and control groups occurring by chance is less than 5%, so the difference is statistically significant; however, the possibility of confounding variables or a small sample size should be considered before drawing a firm conclusion.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ TUTOR AI PANEL ============ -->
+    <div class="tool-panel" id="tutorView" style="display:none;">
+      <div class="tool-header"><span style="font-size:26px;">🧑‍🏫</span><div><h1 class="page-title" style="font-size:26px;margin-bottom:2px;">Tutor AI</h1></div><span class="badge">Demo · no API</span></div>
+      <p class="tool-sub">Pick a topic, then keep asking to break it down further — each tap goes one level simpler. This is a scripted demo: it walks through pre-written tiers rather than generating anything live.</p>
+
+      <div class="topic-picker" id="tutorTopics"></div>
+
+      <div class="tutor-box">
+        <div class="tutor-level" id="tutorLevel">Level 1 · standard explanation</div>
+        <div class="tutor-text" id="tutorText">Pick a topic above to begin.</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" id="tutorSimplify">Break this down further ↓</button>
+        <button class="btn" id="tutorReset">Reset to standard level</button>
+      </div>
+
+      <h3 class="sub-title">Ask a question</h3>
+      <div class="qa-list" id="tutorQA"></div>
+    </div>
+
+    <!-- ============ BLURT AI PANEL ============ -->
+    <div class="tool-panel" id="blurtView" style="display:none;">
+      <div class="tool-header"><span style="font-size:26px;">🧠</span><div><h1 class="page-title" style="font-size:26px;margin-bottom:2px;">Blurt AI</h1></div><span class="badge">Demo · no API</span></div>
+      <p class="tool-sub">Pick a topic, then write down absolutely everything you remember about it without looking back at your notes. When you're done, this checks your blurt against the key points and shows what's covered and what's missing — all matched locally in your browser, nothing is sent anywhere.</p>
+
+      <div class="topic-picker" id="blurtTopics"></div>
+
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
+        <button class="btn" id="blurtTimerBtn">▶ Start 3-minute timer</button>
+        <span class="timer" id="blurtTimer">03:00</span>
+      </div>
+      <textarea class="blurt" id="blurtText" placeholder="Start typing everything you remember about this topic…"></textarea>
+      <div class="btn-row" style="margin-top:12px;">
+        <button class="btn primary" id="blurtCheck">Check my blurt</button>
+        <button class="btn" id="blurtClear">Clear</button>
+      </div>
+
+      <div class="result-card" id="blurtResult">
+        <div style="font-weight:700;margin-bottom:2px;">Rough coverage estimate</div>
+        <div style="font-size:12.5px;color:var(--text-faint);margin-bottom:6px;">Based on whether key terms appear in your blurt — not a real mark, just a nudge on where to look again.</div>
+        <div class="coverage-bar-track"><div class="coverage-bar-fill" id="blurtBarFill" style="width:0%"></div></div>
+        <div style="font-size:13.5px;margin-bottom:10px;"><strong id="blurtPct">0%</strong> of key terms showed up</div>
+        <div class="kw-grid" id="blurtKwGrid"></div>
+      </div>
+    </div>
+
+    <!-- ============ FEYNMAN AI PANEL ============ -->
+    <div class="tool-panel" id="feynmanView" style="display:none;">
+      <div class="tool-header"><span style="font-size:26px;">🎤</span><div><h1 class="page-title" style="font-size:26px;margin-bottom:2px;">Feynman AI</h1></div><span class="badge">Demo · no API</span></div>
+      <p class="tool-sub">Pick a topic, press the mic, and explain it out loud as if you were teaching it to someone who's never heard of it — plain words, no jargon you can't unpack. Uses your browser's built-in speech recognition if it's available; otherwise just type your explanation instead.</p>
+
+      <div class="topic-picker" id="feynmanTopics"></div>
+
+      <div class="mic-row">
+        <div class="mic-btn" id="micBtn">🎙️</div>
+        <div class="mic-status" id="micStatus">Tap the mic and start explaining, or just type below.</div>
+      </div>
+      <textarea class="blurt" id="feynmanText" placeholder="Your explanation will appear here as you speak, or type it directly…"></textarea>
+      <div class="btn-row" style="margin-top:12px;">
+        <button class="btn primary" id="feynmanCheck">Check my explanation</button>
+        <button class="btn" id="feynmanClear">Clear</button>
+      </div>
+
+      <div class="result-card" id="feynmanResult">
+        <div style="font-weight:700;margin-bottom:2px;">Plain-English coverage</div>
+        <div style="font-size:12.5px;color:var(--text-faint);margin-bottom:6px;">Checks whether the core ideas came through — not exact wording, since Feynman-style explaining should sound nothing like the textbook.</div>
+        <div class="coverage-bar-track"><div class="coverage-bar-fill" id="feynBarFill" style="width:0%"></div></div>
+        <div style="font-size:13.5px;margin-bottom:10px;"><strong id="feynPct">0%</strong> of core ideas showed up</div>
+        <div class="kw-grid" id="feynKwGrid"></div>
+        <p style="margin:12px 0 0;font-size:13px;color:var(--text-dim);">If you caught yourself reaching for a technical term you couldn't unpack in plain words, that's the exact spot to go back and re-read.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* ================= DATA: topics with tiered explanations, Q&A and key terms ================= */
+const TOPICS = {
+  structure: {
+    label: "Neurone structure",
+    section: "s1",
+    tiers: [
+      "A myelinated motor neurone has a cell body, dendrites carrying impulses in, and a long axon carrying the impulse out, wrapped in segments of myelin (formed by Schwann cells) with exposed gaps — the nodes of Ranvier — in between.",
+      "Think of the axon as an insulated cable: Schwann cells wind round it to form the myelin coating, but they leave small bare patches every so often. Those bare patches, the nodes of Ranvier, are the only places where the 'wire' is actually exposed to the outside.",
+      "Picture a long extension cord with rubber tubing (myelin) taped around it in separate sections by little workers (Schwann cells), leaving small gaps of bare wire between each piece of tubing — those gaps are the nodes of Ranvier, and they're the only spots where electricity can actually leak in or out."
+    ],
+    qa: [
+      ["Why does it matter that myelin gives electrical, not thermal, insulation?", "Because the whole point of myelin is to stop ions crossing the membrane except at the nodes of Ranvier — it has nothing to do with keeping the axon warm, and writing 'thermal insulation' is marked as an explicit error."],
+      ["What's actually concentrated at the nodes of Ranvier?", "Voltage-gated sodium channels — they're the only place along a myelinated axon where depolarisation can occur, because it's the only place the axon membrane is exposed."]
+    ],
+    keywords: ["cell body","dendrites","axon","Schwann cells","myelin sheath","electrical insulation","nodes of Ranvier","voltage-gated sodium channels"]
+  },
+  resting: {
+    label: "The resting potential",
+    section: "s2",
+    tiers: [
+      "The resting potential (≈ −70 mV) comes from potassium ions leaking out faster than sodium ions leak in through permeable channels, combined with the sodium–potassium pump actively pushing 3 Na⁺ out for every 2 K⁺ in.",
+      "There's more potassium inside the axon and more sodium outside — set up partly by the pump. The membrane happens to be leakier to potassium, so it drifts out faster than sodium drifts in, and the pump keeps actively fighting both gradients, pumping more sodium out than potassium in. All together, that leaves the inside more negative than the outside.",
+      "Imagine two bath tubs connected by a wall with two different plugholes — a big one for potassium, a tiny one for sodium — plus someone constantly bailing water between them, taking out three sodium buckets for every two potassium buckets they put back. Because potassium empties out faster through its bigger plughole, and the bailing keeps working against both, the axon's tub ends up sitting lower (more negative) than the outside tub."
+    ],
+    qa: [
+      ["Why is it not enough to just mention the pump when explaining the resting potential?", "Because the permeability difference (K⁺ leaking out faster than Na⁺ leaks in through leak channels) is a separate, equally creditable mechanism — merging it with the pump into one vague sentence loses marks that stating both distinctly would earn."],
+      ["What word absolutely has to appear in a resting-potential answer?", "'Ions' — two or three otherwise-correct points with no reference to ions anywhere caps the mark very low, even if 'sodium' and 'potassium' are both mentioned."]
+    ],
+    keywords: ["concentration gradient","potassium ions","sodium ions","differential permeability","leak channels","sodium-potassium pump","active transport","ATP","negative","resting potential"]
+  },
+  actionpotential: {
+    label: "Depolarisation & the action potential",
+    section: "s3",
+    tiers: [
+      "At threshold (≈−55 mV), voltage-gated Na⁺ channels open and Na⁺ floods in, depolarising the membrane up to about +40 mV; then Na⁺ channels close, K⁺ channels open, and K⁺ leaving repolarises the membrane, briefly overshooting into hyperpolarisation.",
+      "Push the membrane hard enough and sodium channels burst open, letting sodium rush in — and the more that rushes in, the more channels open, snowballing the voltage right up past zero. At the peak, those channels slam shut and a different set open, letting potassium rush back out, dragging the voltage back down — and slightly past resting, before it settles.",
+      "It's like a line of dominoes tipping upward: knock the first one past a certain angle (threshold) and it tips the next, and the next, faster and faster (positive feedback), until the whole row is standing tall (peak). Then a second row of dominoes, set up to fall the opposite way, gets knocked over, pulling everything back down — but it overshoots slightly past where it started before things settle back to normal."
+    ],
+    qa: [
+      ["Is it ever correct to say the sodium-potassium pump causes depolarisation?", "No — depolarisation and repolarisation are both channel-driven facilitated diffusion. The pump is explicitly rejected for both; it only helps restore the resting potential afterwards."],
+      ["Why does hyperpolarisation happen?", "Voltage-gated potassium channels are slightly slow to close, so slightly too much K⁺ leaves the axon before they shut, taking the membrane briefly below the normal resting potential."]
+    ],
+    keywords: ["threshold","voltage-gated sodium channels","facilitated diffusion","depolarisation","positive feedback","potassium channels","repolarisation","hyperpolarisation","resting potential restored"]
+  },
+  allornothing: {
+    label: "All-or-nothing principle",
+    section: "s4",
+    tiers: [
+      "Below threshold, no action potential fires at all; at or above threshold, every action potential is identical — so stimulus strength is coded by the frequency of impulses and/or how many neurones fire, never by the size of one impulse.",
+      "It's like a light switch, not a dimmer: either the stimulus is strong enough to flip it, giving a full identical spike, or it isn't and absolutely nothing happens. A 'stronger' feeling isn't a bigger spike — it's more spikes, more often.",
+      "Think of a gun that either fires a full bullet or doesn't fire at all — you can't half-pull the trigger for a smaller bang. To send a 'louder' message, you don't fire a bigger bullet, you just pull the trigger more times per second, or get more guns firing at once."
+    ],
+    qa: [
+      ["What's wrong with saying a sub-threshold stimulus produces 'a smaller action potential'?", "It produces no action potential at all, not a smaller one — that's the whole point of the all-or-nothing principle."],
+      ["A toxin keeps sodium channels stuck open. What's the consequence, reasoned through the mechanism?", "Sodium keeps entering, so the membrane can't repolarise back to resting, so it can't fire a further action potential normally — the axon effectively stops conducting at that point."]
+    ],
+    keywords: ["threshold","all-or-nothing","identical size","frequency","number of neurones firing","stimulus intensity","sodium channels stuck open","complementary shape"]
+  },
+  conduction: {
+    label: "Saltatory vs continuous conduction",
+    section: "s5",
+    tiers: [
+      "In a myelinated axon, depolarisation can only happen at the nodes of Ranvier, so the impulse appears to jump between them (saltatory conduction) — much faster than a non-myelinated axon, where every point along the membrane has to depolarise in turn.",
+      "Myelin acts like insulating tape around the axon, so the impulse can only 'touch' the membrane at the bare gaps — the nodes of Ranvier — and effectively leapfrogs between them. Without that insulation, the impulse has to restart at every single point along the whole axon, which takes far longer.",
+      "It's the difference between hopping across a river on stepping stones (saltatory conduction — quick, only a few touchdown points) and wading straight through the water the whole way across (continuous conduction in a non-myelinated axon — touching every single point, much slower)."
+    ],
+    qa: [
+      ["Why doesn't myelin itself speed up the impulse directly?", "It doesn't conduct the impulse faster by itself — it insulates the membrane, which confines depolarisation to the nodes of Ranvier, and it's that jumping between fewer points that makes overall transmission faster."],
+      ["What happens to conduction in a demyelinating disease like Guillain–Barré syndrome?", "Saltatory conduction is reduced or lost, depolarisation spreads over a greater area of exposed membrane instead of jumping cleanly node to node, conduction is slowed, and impulses may fail to reach the target cell at all."]
+    ],
+    keywords: ["myelinated axon","electrical insulation","nodes of Ranvier","saltatory conduction","non-myelinated axon","continuous conduction","demyelination","reduced or lost","impulse","action potential"]
+  },
+  refractory: {
+    label: "The refractory period",
+    section: "s6",
+    tiers: [
+      "Right after firing, an axon has an absolute refractory period (sodium channels locked shut, can't refire whatever the stimulus), then a relative one (only an unusually strong stimulus works) — together these keep impulses discrete, limit their maximum frequency, and force them to travel one way only.",
+      "Think of it as a mandatory cooldown: straight after firing, that bit of axon simply cannot fire again no matter how hard you try (absolute), and for a bit afterwards it's much harder to fire, needing an extra-strong push (relative). This cooldown is exactly why impulses stay separate instead of blurring together, why there's a speed limit on how many can fire per second, and why they can't travel backwards.",
+      "Like a camera flash that needs to recharge: right after it fires, pressing the button does nothing at all, however hard you press (absolute refractory). A little later, it might fire again, but only if you somehow trigger it really strongly (relative refractory). That recharge time is exactly why flashes stay as separate flashes, sets a limit on how many you can get per second, and stops the flash's own light from somehow 'reflashing' the bit that just went off."
+    ],
+    qa: [
+      ["What two separate functions does the refractory period have — and why do both need stating?", "It ensures impulses travel in one direction only, and it produces discrete, frequency-limited impulses. Stating only one — e.g. just 'prevents too many impulses' — isn't the same as crediting both separately."],
+      ["A neurone has a refractory period of 2 ms. What's its maximum firing frequency?", "Convert to seconds: 2 ÷ 1000 = 0.002 s. Maximum frequency = 1 ÷ 0.002 = 500 impulses per second (500 Hz)."]
+    ],
+    keywords: ["absolute refractory period","sodium channels inactivated","relative refractory period","hyperpolarisation","unidirectional","discrete impulses","maximum frequency","refractory period in seconds"]
+  },
+  speedfactors: {
+    label: "Factors affecting speed",
+    section: "s7",
+    tiers: [
+      "Myelination speeds conduction up via saltatory conduction; a wider axon is faster because it leaks proportionally less charge and offers less internal resistance; higher temperature speeds channels and diffusion up to about 40°C, above which proteins denature.",
+      "Three separate levers control speed: wrap the axon (myelination) so it jumps between nodes instead of firing everywhere; make the axon fatter, so less charge leaks out relative to its size; or warm it up a bit, so ions and channels move and react faster — but push the temperature too far and the proteins doing the work start falling apart.",
+      "Picture a fat, insulated hosepipe carrying water fast with barely any leaks (myelinated, wide axon) versus a thin, bare, uninsulated hose leaking everywhere (non-myelinated, narrow axon). Warm the water up a little and it flows faster too — but boil it, and the hose itself starts to melt."
+    ],
+    qa: [
+      ["Why does a wider axon conduct faster?", "It has a smaller surface area to volume ratio, so proportionally less ion leakage across the membrane, and less resistance to ion flow along the inside of the axon — both make conduction faster."],
+      ["Why does conduction speed fall sharply above about 40°C?", "Channel and pump proteins begin to denature at high temperatures, so they stop working properly even though ions themselves would otherwise diffuse faster."],
+      ["What must a fully rigorous statistical conclusion about myelin/disease data include?", "A reference to probability — e.g. 'the probability of this difference occurring by chance is less than 5%' — and the specific claim that the difference (not just 'the results') is significant."]
+    ],
+    keywords: ["myelination","saltatory conduction","axon diameter","surface area to volume ratio","ion leakage","resistance","temperature","kinetic energy","denature","statistically significant"]
+  }
+};
+const TOPIC_ORDER = ["structure","resting","actionpotential","allornothing","conduction","refractory","speedfactors"];
+
+/* ================= NAVIGATION (Full notes / Cram / Drill / AI tools) ================= */
+const notesView = document.getElementById('notesView');
+const allViews = {
+  notes: notesView,
+  cram: document.getElementById('cramView'),
+  drill: document.getElementById('drillView'),
+  tutor: document.getElementById('tutorView'),
+  blurt: document.getElementById('blurtView'),
+  feynman: document.getElementById('feynmanView')
+};
+function showView(name){
+  Object.entries(allViews).forEach(([k,v])=> v.style.display = (k===name?'block':'none') );
+  document.querySelectorAll('.side-tool').forEach(t=> t.classList.toggle('active', t.dataset.tool===name) );
+  document.querySelectorAll('.mode-tab').forEach(t=> t.classList.toggle('active', t.dataset.mode===name) );
+  window.scrollTo({top:0});
+}
+function showNotes(){ showView('notes'); }
+function showTool(name){ showView(name); }
+document.querySelectorAll('.side-tool').forEach(t=>{
+  t.addEventListener('click', ()=> showView(t.dataset.tool));
+});
+document.querySelectorAll('.mode-tab').forEach(t=>{
+  t.addEventListener('click', ()=> showView(t.dataset.mode));
+});
+document.querySelectorAll('[data-target]').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    const id = el.dataset.target;
+    showView('notes');
+    if(id!=='notesTop'){ document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'}); }
+    else { window.scrollTo({top:0, behavior:'smooth'}); }
+    if(window.innerWidth<=900) sidebar.classList.remove('open');
+  });
+});
+document.querySelectorAll('.toc-item').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    document.getElementById(el.dataset.jump).scrollIntoView({behavior:'smooth', block:'start'});
+  });
+});
+
+/* click-to-reveal Q&A used by the Drill view (static markup, not built by JS) */
+document.querySelectorAll('#drillView .qa-q').forEach(q=>{
+  const a = q.nextElementSibling;
+  q.addEventListener('click', ()=> a.classList.toggle('show'));
+});
+
+/* ================= PER-SECTION EXPLANATION-LEVEL SWITCHER ================= */
+document.querySelectorAll('.level-switcher').forEach(sw=>{
+  const group = sw.dataset.group;
+  const blocks = document.querySelectorAll(`.level-block[data-group="${group}"]`);
+  const dots = sw.querySelectorAll('.level-dot');
+  const label = sw.querySelector('.level-label');
+  const btn = sw.querySelector('.level-btn');
+  const names = {1:'🧸 Level 1 · the big idea only', 2:'📘 Level 2 · key terms explained', 3:'🎓 Level 3 · full exam detail'};
+  let level = 3;
+  function render(){
+    blocks.forEach(b=> b.style.display = (parseInt(b.dataset.level,10)===level ? 'block' : 'none') );
+    dots.forEach(d=> d.classList.toggle('active', parseInt(d.dataset.level,10)===level) );
+    label.textContent = names[level];
+    btn.textContent = level>1 ? 'Explain more simply ↓' : '🎓 Back to full exam detail';
+  }
+  btn.addEventListener('click', ()=>{ level = level>1 ? level-1 : 3; render(); });
+  dots.forEach(d=>{
+    d.addEventListener('click', ()=>{ level = parseInt(d.dataset.level,10); render(); });
+  });
+  render();
+});
+
+/* highlight active sidebar link on scroll */
+const secEls = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10'].map(id=>document.getElementById(id));
+const links = document.querySelectorAll('.side-link[data-target]');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      links.forEach(l=>l.classList.toggle('active', l.dataset.target===e.target.id));
+    }
+  });
+},{rootMargin:'-10% 0px -70% 0px'});
+secEls.forEach(el=> el && io.observe(el));
+
+/* mobile menu */
+const sidebar = document.getElementById('sidebar');
+document.getElementById('menuBtn').addEventListener('click', ()=> sidebar.classList.toggle('open'));
+
+/* dark mode */
+document.getElementById('darkToggle').addEventListener('click', ()=>{
+  document.documentElement.classList.toggle('dark');
+});
+
+/* ================= ANIMATED ACTION-POTENTIAL GRAPH (Section 3) ================= */
+const scenarios = {
+  full: {
+    desc: "A stimulus reaches threshold (≈−55 mV): voltage-gated Na⁺ channels open, the membrane depolarises rapidly to about +40 mV, then Na⁺ channels close and K⁺ channels open, repolarising the membrane and briefly overshooting into hyperpolarisation before resting is restored.",
+    points: "0,170 60,170 90,145 100,130 115,60 125,20 140,60 160,140 180,185 200,192 230,180 260,170 500,170"
+  },
+  sub: {
+    desc: "A weaker stimulus fails to reach threshold: some depolarisation occurs, but because it never crosses −55 mV, the voltage-gated sodium channels do not open in a self-sustaining way, and the membrane simply returns to its resting potential — no action potential fires, exactly as the all-or-nothing principle predicts.",
+    points: "0,170 60,170 90,160 110,152 130,158 150,168 180,170 500,170"
+  }
+};
+let currentScenario = 'full';
+const graphLine = document.getElementById('graphLine');
+function renderScenario(animate){
+  const s = scenarios[currentScenario];
+  document.getElementById('scenarioDesc').textContent = s.desc;
+  graphLine.setAttribute('points', s.points);
+  graphLine.classList.remove('drawn');
+  const len = graphLine.getTotalLength();
+  graphLine.style.strokeDasharray = len;
+  graphLine.style.strokeDashoffset = animate ? len : 0;
+  if(animate){
+    graphLine.getBoundingClientRect();
+    graphLine.classList.add('drawn');
+    requestAnimationFrame(()=>{ graphLine.style.strokeDashoffset = 0; });
+  }
+}
+document.querySelectorAll('.scenario-chip').forEach(c=>{
+  c.addEventListener('click', ()=>{
+    document.querySelectorAll('.scenario-chip').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+    currentScenario = c.dataset.scenario;
+    renderScenario(false);
+  });
+});
+document.getElementById('playGraph').addEventListener('click', ()=> renderScenario(true));
+renderScenario(false);
+
+/* ================= TUTOR AI ================= */
+let tutorTopic = 'structure';
+let tutorTier = 0;
+const tutorTopicsEl = document.getElementById('tutorTopics');
+TOPIC_ORDER.forEach(key=>{
+  const chip = document.createElement('div');
+  chip.className='topic-chip'+(key===tutorTopic?' active':'');
+  chip.textContent = TOPICS[key].label;
+  chip.addEventListener('click', ()=>{ tutorTopic=key; tutorTier=0; renderTutor(); highlightChip(tutorTopicsEl, chip); });
+  tutorTopicsEl.appendChild(chip);
+});
+function highlightChip(container, active){
+  container.querySelectorAll('.topic-chip').forEach(c=>c.classList.remove('active'));
+  active.classList.add('active');
+}
+function renderTutor(){
+  const t = TOPICS[tutorTopic];
+  document.getElementById('tutorLevel').textContent = `Level ${tutorTier+1} · ` + (tutorTier===0?'standard explanation':tutorTier===1?'simpler explanation':'as-simple-as-it-gets, with an everyday analogy');
+  document.getElementById('tutorText').textContent = t.tiers[tutorTier];
+  document.getElementById('tutorSimplify').disabled = tutorTier>=t.tiers.length-1;
+  const qaEl = document.getElementById('tutorQA');
+  qaEl.innerHTML='';
+  t.qa.forEach(([q,a])=>{
+    const q1=document.createElement('div'); q1.className='qa-q'; q1.textContent='❓ '+q;
+    const a1=document.createElement('div'); a1.className='qa-a'; a1.textContent=a;
+    q1.addEventListener('click', ()=> a1.classList.toggle('show'));
+    qaEl.appendChild(q1); qaEl.appendChild(a1);
+  });
+}
+document.getElementById('tutorSimplify').addEventListener('click', ()=>{
+  const t = TOPICS[tutorTopic];
+  if(tutorTier < t.tiers.length-1){ tutorTier++; renderTutor(); }
+});
+document.getElementById('tutorReset').addEventListener('click', ()=>{ tutorTier=0; renderTutor(); });
+renderTutor();
+
+/* ================= shared keyword-coverage checker ================= */
+function checkCoverage(text, keywords){
+  const lower = text.toLowerCase();
+  const hits = keywords.filter(k=> lower.includes(k.toLowerCase()) );
+  return { hits, pct: Math.round((hits.length/keywords.length)*100) };
+}
+function renderKwGrid(container, keywords, hits){
+  container.innerHTML='';
+  keywords.forEach(k=>{
+    const span = document.createElement('span');
+    const isHit = hits.includes(k);
+    span.className = 'kw '+(isHit?'hit':'miss');
+    span.textContent = (isHit?'✓ ':'· ')+k;
+    container.appendChild(span);
+  });
+}
+
+/* ================= BLURT AI ================= */
+let blurtTopic = 'actionpotential';
+const blurtTopicsEl = document.getElementById('blurtTopics');
+TOPIC_ORDER.forEach(key=>{
+  const chip = document.createElement('div');
+  chip.className='topic-chip'+(key===blurtTopic?' active':'');
+  chip.textContent = TOPICS[key].label;
+  chip.addEventListener('click', ()=>{ blurtTopic=key; highlightChip(blurtTopicsEl, chip); document.getElementById('blurtResult').classList.remove('show'); });
+  blurtTopicsEl.appendChild(chip);
+});
+document.getElementById('blurtCheck').addEventListener('click', ()=>{
+  const text = document.getElementById('blurtText').value.trim();
+  const t = TOPICS[blurtTopic];
+  const {hits, pct} = checkCoverage(text || ' ', t.keywords);
+  document.getElementById('blurtResult').classList.add('show');
+  document.getElementById('blurtPct').textContent = pct+'%';
+  document.getElementById('blurtBarFill').style.width = pct+'%';
+  renderKwGrid(document.getElementById('blurtKwGrid'), t.keywords, hits);
+});
+document.getElementById('blurtClear').addEventListener('click', ()=>{
+  document.getElementById('blurtText').value='';
+  document.getElementById('blurtResult').classList.remove('show');
+});
+let blurtTimeLeft = 180, blurtInterval=null;
+document.getElementById('blurtTimerBtn').addEventListener('click', function(){
+  if(blurtInterval){ clearInterval(blurtInterval); blurtInterval=null; this.textContent='▶ Start 3-minute timer'; blurtTimeLeft=180; document.getElementById('blurtTimer').textContent='03:00'; return; }
+  this.textContent='⏸ Stop timer';
+  blurtInterval = setInterval(()=>{
+    blurtTimeLeft--;
+    const m = String(Math.floor(blurtTimeLeft/60)).padStart(2,'0');
+    const s = String(blurtTimeLeft%60).padStart(2,'0');
+    document.getElementById('blurtTimer').textContent = `${m}:${s}`;
+    if(blurtTimeLeft<=0){ clearInterval(blurtInterval); blurtInterval=null; document.getElementById('blurtTimerBtn').textContent='▶ Start 3-minute timer'; blurtTimeLeft=180; }
+  },1000);
+});
+
+/* ================= FEYNMAN AI ================= */
+let feynTopic = 'conduction';
+const feynTopicsEl = document.getElementById('feynmanTopics');
+TOPIC_ORDER.forEach(key=>{
+  const chip = document.createElement('div');
+  chip.className='topic-chip'+(key===feynTopic?' active':'');
+  chip.textContent = TOPICS[key].label;
+  chip.addEventListener('click', ()=>{ feynTopic=key; highlightChip(feynTopicsEl, chip); document.getElementById('feynmanResult').classList.remove('show'); });
+  feynTopicsEl.appendChild(chip);
+});
+document.getElementById('feynmanCheck').addEventListener('click', ()=>{
+  const text = document.getElementById('feynmanText').value.trim();
+  const t = TOPICS[feynTopic];
+  const {hits, pct} = checkCoverage(text || ' ', t.keywords);
+  document.getElementById('feynmanResult').classList.add('show');
+  document.getElementById('feynPct').textContent = pct+'%';
+  document.getElementById('feynBarFill').style.width = pct+'%';
+  renderKwGrid(document.getElementById('feynKwGrid'), t.keywords, hits);
+});
+document.getElementById('feynmanClear').addEventListener('click', ()=>{
+  document.getElementById('feynmanText').value='';
+  document.getElementById('feynmanResult').classList.remove('show');
+});
+
+/* mic: use Web Speech API if present, otherwise just tell the user to type */
+const micBtn = document.getElementById('micBtn');
+const micStatus = document.getElementById('micStatus');
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognizing = false, recognition = null;
+if(SpeechRec){
+  recognition = new SpeechRec();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.onresult = (e)=>{
+    let finalText = '';
+    for(let i=0;i<e.results.length;i++){ finalText += e.results[i][0].transcript + ' '; }
+    document.getElementById('feynmanText').value = finalText.trim();
+  };
+  recognition.onerror = ()=>{ micStatus.textContent='Mic access unavailable — you can type your explanation instead.'; };
+  recognition.onend = ()=>{ recognizing=false; micBtn.classList.remove('rec'); micStatus.textContent='Stopped listening — tap the mic to resume, or edit the text directly.'; };
+}
+micBtn.addEventListener('click', ()=>{
+  if(!SpeechRec){ micStatus.textContent="Speech input isn't supported in this browser — just type your explanation below instead."; return; }
+  if(!recognizing){
+    recognition.start(); recognizing=true; micBtn.classList.add('rec');
+    micStatus.textContent='Listening — explain it out loud as if teaching a beginner…';
+  } else {
+    recognition.stop(); recognizing=false; micBtn.classList.remove('rec');
+  }
+});
+</script>
+
+<script id="site-pager">
+(function(){
+  var prev={"href": "/notes/3-6-1-3-control-of-heart-rate", "num": "3.6.1.3", "title": "Control of Heart Rate"}, next={"href": "/notes/3-6-2-2-synaptic-transmission", "num": "3.6.2.2", "title": "Synaptic Transmission"};
+  function card(p,kind){
+    if(!p||!p.href) return '<a class="ghost"></a>';
+    return '<a class="'+kind+'" href="'+p.href+'"><div class="lbl">'+(kind==='prev'?'&#8592; Previous':'Next &#8594;')+
+      '</div><div class="nm"><span class="num">'+p.num+'</span> '+p.title+'</div></a>';
+  }
+  var host=document.getElementById('notesView');
+  if(host){
+    var nav=document.createElement('div');
+    nav.className='pager';
+    nav.innerHTML=card(prev,'prev')+card(next,'next');
+    host.appendChild(nav);
+  }
+  // persist theme across pages
+  var dt=document.getElementById('darkToggle');
+  if(dt){dt.addEventListener('click',function(){
+    try{localStorage.setItem('bcr-theme',document.documentElement.classList.contains('dark')?'dark':'light');}catch(e){}
+  });}
+  // close mobile sidebar after tapping a cross-page link
+  var sb=document.getElementById('sidebar');
+  if(sb){sb.addEventListener('click',function(e){
+    var a=e.target.closest('a[href]');
+    if(a&&sb.classList.contains('open')) sb.classList.remove('open');
+  });}
+})();
+</script>
+
+
+<script id="practice-js">
+(function(){
+  var KEY='bcr-level';
+  function apply(lvl){
+    document.querySelectorAll('.practice').forEach(function(p){
+      var qs=0, mk=0;
+      p.querySelectorAll('.prac-group').forEach(function(g){
+        var show = (lvl==='all') || (g.dataset.level===lvl);
+        g.hidden=!show;
+        if(show){
+          qs += g.querySelectorAll('.prac-q').length;
+          g.querySelectorAll('.prac-q').forEach(function(q){ mk += parseInt(q.dataset.marks,10)||0; });
+        }
+      });
+      var c=p.querySelector('[data-prac-count]'), m=p.querySelector('[data-prac-marks]');
+      if(c) c.textContent=qs; if(m) m.textContent=mk;
+      var e=p.querySelector('.prac-empty'), b=p.querySelector('.prac-body'), f=p.querySelector('.prac-foot');
+      if(e){ e.style.display = qs? 'none':'block'; }
+      if(b) b.style.display = qs? '':'none';
+      if(f) f.style.display = qs? '':'none';
+      p.querySelectorAll('.lvl-switch button').forEach(function(btn){
+        btn.classList.toggle('on', btn.dataset.lvl===lvl);
+      });
+    });
+  }
+  var saved='all';
+  try{ saved=localStorage.getItem(KEY)||'all'; }catch(e){}
+  document.addEventListener('click',function(e){
+    var btn=e.target.closest('.lvl-switch button');
+    if(btn){ try{localStorage.setItem(KEY,btn.dataset.lvl);}catch(e2){} apply(btn.dataset.lvl); return; }
+    var rev=e.target.closest('.prac-reveal');
+    if(rev){
+      var box=rev.closest('.practice');
+      var hidden=box.querySelector('.ms[hidden]')!==null;
+      box.querySelectorAll('.ms').forEach(function(m){ m.hidden=!hidden; });
+      rev.textContent = hidden ? 'Hide mark schemes' : 'Show mark schemes';
+    }
+  });
+  apply(saved);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3.2.2 All Cells Arise From Other Cells &middot; biochemrevise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --sidebar:#fbfbfa;
+    --border:#eceae7;
+    --text:#37352f;
+    --text-dim:#787774;
+    --text-faint:#9b9a97;
+    --hover:#f1f1ef;
+    --accent:#2383e2;
+    --red-bg:#fdebec; --red-line:#e88a8a; --red-text:#af3232;
+    --blue-bg:#e7f3f8; --blue-line:#7ec1e0;
+    --amber-bg:#fdf3dd; --amber-line:#e9b95d; --amber-text:#97690c;
+    --green-bg:#edf6ee; --green-line:#8bc79a; --green-text:#2f7a3f;
+    --purple-bg:#f4effa; --purple-line:#b39ce0;
+    --radius:6px;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+    --serif:'Source Serif 4',Georgia,serif;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  }
+  html.dark{
+    --bg:#191919; --sidebar:#202020; --border:#2f2f2f; --text:#e9e9e7; --text-dim:#9b9a97; --text-faint:#6f6f6c;
+    --hover:#2a2a2a; --red-bg:#3a2222; --amber-bg:#3a3222; --blue-bg:#1f2c34; --green-bg:#20302a; --purple-bg:#2c2536;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--sans);color:var(--text);background:var(--bg);font-size:15.5px;line-height:1.6;}
+  ::selection{background:#cbe6ff;}
+
+  .app{display:flex;min-height:100vh;}
+  .sidebar{
+    width:264px;flex:0 0 264px;background:var(--sidebar);border-right:1px solid var(--border);
+    padding:14px 8px;position:sticky;top:0;height:100vh;overflow-y:auto;
+  }
+  .workspace{display:flex;align-items:center;gap:8px;padding:6px 8px 14px;font-weight:600;font-size:14px;}
+  .workspace .emoji{font-size:18px;}
+  .side-search{
+    display:flex;align-items:center;gap:8px;padding:6px 8px;margin:0 0 6px;border-radius:5px;color:var(--text-dim);
+    font-size:13.5px;cursor:pointer;
+  }
+  .side-search:hover{background:var(--hover);}
+  .side-group-label{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-faint);
+    padding:14px 10px 4px;font-weight:600;}
+  .side-link{
+    display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;color:var(--text-dim);
+    font-size:13.5px;cursor:pointer;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .side-link .num{color:var(--text-faint);font-variant-numeric:tabular-nums;font-size:12px;width:14px;flex:0 0 auto;}
+  .side-link:hover{background:var(--hover);color:var(--text);}
+  .side-link.active{background:var(--hover);color:var(--text);font-weight:600;}
+  .side-tool{padding:5px 8px;border-radius:5px;font-size:13.5px;color:var(--text-dim);cursor:pointer;display:flex;gap:8px;align-items:center;}
+  .side-tool:hover{background:var(--hover);color:var(--text);}
+  .side-tool.active{background:var(--hover);color:var(--text);font-weight:600;}
+  .sidebar-footer{margin-top:14px;padding:8px 10px;font-size:12px;color:var(--text-faint);border-top:1px solid var(--border);}
+  .darkmode-toggle{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;color:var(--text-dim);font-size:13.5px;cursor:pointer;}
+  .darkmode-toggle:hover{background:var(--hover);}
+
+  .main{flex:1;min-width:0;padding:56px calc(50% - 380px);max-width:100%;}
+  @media (max-width:900px){ .main{padding:40px 20px;} .sidebar{position:fixed;left:-264px;transition:left .2s;z-index:50;box-shadow:0 0 0 2000px rgba(0,0,0,0);}
+    .sidebar.open{left:0;box-shadow:2px 0 24px rgba(0,0,0,.25);} .menu-btn{display:flex !important;} }
+  .menu-btn{display:none;position:fixed;top:14px;left:14px;z-index:60;background:var(--bg);border:1px solid var(--border);
+    border-radius:6px;width:34px;height:34px;align-items:center;justify-content:center;cursor:pointer;font-size:16px;}
+
+  .breadcrumb{color:var(--text-faint);font-size:13px;margin-bottom:8px;display:flex;gap:6px;align-items:center;}
+  .page-emoji{font-size:52px;margin-bottom:6px;}
+  h1.page-title{font-family:var(--sans);font-weight:800;font-size:34px;margin:0 0 6px;letter-spacing:-.01em;}
+  .subtitle{color:var(--text-dim);font-size:15px;margin-bottom:6px;}
+  .meta-row{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 30px;}
+  .pill{font-size:12px;background:var(--hover);color:var(--text-dim);padding:3px 9px;border-radius:100px;border:1px solid var(--border);}
+
+  section.spec-section{margin-bottom:52px;scroll-margin-top:24px;}
+  .sec-eyebrow{display:flex;align-items:center;gap:10px;color:var(--text-faint);font-size:12.5px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+  h2.sec-title{font-size:23px;font-weight:800;margin:0 0 14px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px;}
+  h2.sec-title .icon{font-size:22px;}
+  h3.sub-title{font-size:16px;font-weight:700;margin:26px 0 10px;}
+  p{margin:0 0 14px;}
+  .lede{color:var(--text-dim);font-size:15px;margin-bottom:18px;}
+
+  .callout{display:flex;gap:10px;padding:12px 14px;border-radius:var(--radius);margin:0 0 16px;font-size:14.5px;}
+  .callout .ic{flex:0 0 auto;font-size:17px;line-height:1.4;}
+  .callout.spec{background:var(--blue-bg);border:1px solid var(--blue-line);}
+  .callout.tip{background:var(--green-bg);border:1px solid var(--green-line);}
+  .callout.trap{background:var(--red-bg);border:1px solid var(--red-line);}
+  .callout.note{background:var(--purple-bg);border:1px solid var(--purple-line);}
+  .callout p:last-child{margin-bottom:0;}
+
+  details.toggle{border:1px solid var(--border);border-radius:var(--radius);margin:0 0 14px;overflow:hidden;background:var(--bg);}
+  details.toggle summary{
+    list-style:none;cursor:pointer;padding:10px 14px;display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;
+    background:var(--hover);
+  }
+  details.toggle[open] summary{border-bottom:1px solid var(--border);}
+  details.toggle summary::-webkit-details-marker{display:none;}
+  details.toggle summary .caret{transition:transform .15s;font-size:11px;color:var(--text-faint);}
+  details.toggle[open] summary .caret{transform:rotate(90deg);}
+  details.toggle.flag summary{background:var(--red-bg);color:var(--red-text);}
+  details.toggle.flag .body{background:var(--red-bg);}
+  details.toggle .body{padding:12px 14px;font-size:14px;background:var(--bg);}
+  details.toggle .body p:last-child{margin-bottom:0;}
+
+  table.compare{width:100%;border-collapse:collapse;margin:0 0 18px;font-size:14px;}
+  table.compare th, table.compare td{border:1px solid var(--border);padding:9px 12px;text-align:left;vertical-align:top;}
+  table.compare th{background:var(--hover);font-weight:600;font-size:13px;}
+  mark.credit{background:var(--amber-bg);color:var(--amber-text);padding:0 3px;border-radius:3px;font-weight:600;}
+
+  ul.tidy{margin:0 0 16px;padding-left:22px;}
+  ul.tidy li{margin-bottom:6px;}
+  ol.steps{margin:0 0 16px;padding-left:22px;}
+  ol.steps li{margin-bottom:9px;}
+
+  .checklist{list-style:none;margin:0 0 10px;padding:0;}
+  .checklist li{display:flex;gap:9px;align-items:flex-start;padding:5px 4px;border-radius:5px;font-size:14.5px;cursor:pointer;}
+  .checklist li:hover{background:var(--hover);}
+  .checklist input{margin-top:3px;}
+  .checklist li.checked span{color:var(--text-faint);text-decoration:line-through;}
+
+  .diagram-card{border:1px solid var(--border);border-radius:8px;padding:18px;margin:0 0 18px;background:var(--sidebar);}
+  .diagram-cap{font-size:12.5px;color:var(--text-faint);margin-top:8px;text-align:center;}
+  .diagram-card svg text{font-family:var(--sans);}
+
+  hr.div{border:none;border-top:1px solid var(--border);margin:40px 0;}
+
+  .toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-bottom:40px;}
+  .toc-item{border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:13.5px;display:flex;gap:8px;align-items:flex-start;cursor:pointer;}
+  .toc-item:hover{background:var(--hover);}
+  .toc-item .n{color:var(--text-faint);font-weight:700;font-variant-numeric:tabular-nums;}
+
+  /* mode bar (Full notes / Cram / Drill) */
+  .mode-bar{display:flex;gap:8px;margin-bottom:30px;border-bottom:1px solid var(--border);padding-bottom:16px;flex-wrap:wrap;}
+  .mode-tab{border:1px solid var(--border);background:var(--bg);color:var(--text-dim);border-radius:100px;padding:8px 16px;
+    font-size:13.5px;font-weight:600;cursor:pointer;font-family:var(--sans);}
+  .mode-tab:hover{background:var(--hover);}
+  .mode-tab.active{background:var(--text);color:var(--bg);border-color:var(--text);}
+
+  /* per-section explanation-level switcher */
+  .level-switcher{border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin:0 0 18px;background:var(--sidebar);
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .level-label{font-size:13px;font-weight:700;color:var(--text);}
+  .level-dots{display:flex;gap:6px;margin-left:auto;}
+  .level-dot{width:24px;height:24px;border-radius:50%;background:var(--hover);color:var(--text-dim);display:flex;
+    align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);}
+  .level-dot.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .level-block{}
+
+  /* cram view */
+  .cram-point{border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin:0 0 16px;background:var(--sidebar);}
+  .cram-point h3{margin:0 0 8px;font-size:15px;font-weight:800;}
+  .cram-point ul{margin:0;padding-left:20px;}
+  .cram-point li{margin-bottom:5px;font-size:14px;}
+
+  /* drill view */
+  .drill-group{margin-bottom:30px;}
+  .drill-group h3{font-size:16px;font-weight:800;margin:0 0 4px;}
+  .drill-group .lede{margin-bottom:14px;}
+
+  /* interactive step-through */
+  .stepper-wrap{border:1px solid var(--border);border-radius:8px;padding:20px;margin:0 0 20px;background:var(--sidebar);}
+  .stepper-caption{font-size:15px;min-height:52px;}
+  .stepper-nav{display:flex;align-items:center;gap:14px;margin:14px 0;flex-wrap:wrap;}
+  .stepper-dots{display:flex;gap:6px;flex-wrap:wrap;}
+  .step-dot{width:27px;height:27px;border-radius:50%;background:var(--hover);color:var(--text-dim);display:flex;
+    align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);}
+  .step-dot.active{background:var(--accent);color:#fff;border-color:var(--accent);transform:scale(1.12);}
+  .step-indicator{font-size:12.5px;color:var(--text-faint);font-weight:600;}
+
+  .stage-row{display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap;margin:10px 0 4px;}
+  .stage-mini{flex:1;min-width:110px;text-align:center;cursor:pointer;opacity:.5;transition:.15s;}
+  .stage-mini.active{opacity:1;}
+  .stage-mini svg{width:100%;height:auto;}
+  .stage-mini .stage-name{font-size:11.5px;font-weight:700;margin-top:6px;color:var(--text-dim);}
+  .stage-mini.active .stage-name{color:var(--accent);}
+  .stage-mini .stage-count{font-size:10px;color:var(--text-faint);}
+
+  .tool-panel{max-width:720px;}
+  .tool-header{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+  .tool-header .badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px;background:var(--purple-bg);color:#6741a8;text-transform:uppercase;letter-spacing:.04em;}
+  html.dark .tool-header .badge{color:#c9b6ef;}
+  .tool-sub{color:var(--text-dim);font-size:14px;margin-bottom:22px;}
+  .topic-picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+  .topic-chip{border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:13.5px;cursor:pointer;background:var(--bg);color:var(--text-dim);}
+  .topic-chip:hover{background:var(--hover);}
+  .topic-chip.active{background:var(--text);color:var(--bg);border-color:var(--text);}
+
+  .tutor-box{border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:16px;background:var(--sidebar);min-height:70px;}
+  .tutor-level{font-size:11.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;font-weight:600;}
+  .tutor-text{font-size:15px;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;}
+  .btn{border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:6px;padding:8px 14px;font-size:13.5px;
+    cursor:pointer;font-family:var(--sans);font-weight:600;}
+  .btn:hover{background:var(--hover);}
+  .btn.primary{background:var(--text);color:var(--bg);border-color:var(--text);}
+  .btn.primary:hover{opacity:.85;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+
+  .qa-list{display:flex;flex-direction:column;gap:8px;margin-bottom:6px;}
+  .qa-q{border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:14px;cursor:pointer;}
+  .qa-q:hover{background:var(--hover);}
+  .qa-a{border-left:2px solid var(--accent);margin:6px 0 0 8px;padding:2px 0 2px 12px;font-size:13.5px;color:var(--text-dim);display:none;}
+  .qa-a.show{display:block;}
+
+  textarea.blurt{
+    width:100%;min-height:160px;border:1px solid var(--border);border-radius:8px;padding:14px;font-family:var(--sans);
+    font-size:14.5px;resize:vertical;background:var(--bg);color:var(--text);
+  }
+  textarea.blurt:focus{outline:2px solid var(--accent);outline-offset:-1px;}
+  .timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:13px;color:var(--text-dim);}
+  .result-card{border:1px solid var(--border);border-radius:8px;padding:18px;margin-top:16px;background:var(--sidebar);display:none;}
+  .result-card.show{display:block;}
+  .coverage-bar-track{height:8px;border-radius:100px;background:var(--border);overflow:hidden;margin:6px 0 14px;}
+  .coverage-bar-fill{height:100%;background:var(--green-line);border-radius:100px;transition:width .4s;}
+  .kw-grid{display:flex;flex-wrap:wrap;gap:7px;}
+  .kw{font-size:12.5px;padding:4px 10px;border-radius:100px;border:1px solid var(--border);color:var(--text-dim);}
+  .kw.hit{background:var(--green-bg);border-color:var(--green-line);color:var(--green-text);}
+  .kw.miss{background:var(--red-bg);border-color:var(--red-line);color:var(--red-text);}
+
+  .mic-row{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+  .mic-btn{width:54px;height:54px;border-radius:50%;background:var(--red-bg);border:2px solid var(--red-line);
+    display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;flex:0 0 auto;}
+  .mic-btn.rec{background:#e14b4b;border-color:#e14b4b;animation:pulse 1.2s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(225,75,75,.4);}70%{box-shadow:0 0 0 12px rgba(225,75,75,0);}100%{box-shadow:0 0 0 0 rgba(225,75,75,0);}}
+  .mic-status{font-size:13.5px;color:var(--text-dim);}
+
+  footer.page-footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--border);color:var(--text-faint);font-size:12.5px;}
+</style>
+<meta name="description" content="How a eukaryotic cell divides by mitosis, why that division has to stay tightly controlled, how a prokaryotic cell divides by the simpler process of binary fission, and how the roo">
+<meta property="og:title" content="3.2.2 All Cells Arise From Other Cells">
+<meta property="og:description" content="How a eukaryotic cell divides by mitosis, why that division has to stay tightly controlled, how a prokaryotic cell divides by the simpler process of binary fission, and how the roo">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://biochemrevise.co.uk/notes/3-2-2-all-cells-arise-from-other-cells">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%A7%AC%3C/text%3E%3C/svg%3E">
+<script>(function(){try{var t=localStorage.getItem('bcr-theme');
+if(t==='dark'||(t===null&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){
+document.documentElement.classList.add('dark');}}catch(e){}})();</script>
+
+<style id="site-nav-css">
+  .brand{display:flex;align-items:center;gap:8px;padding:6px 8px 4px;font-weight:700;font-size:14.5px;
+    color:var(--text);text-decoration:none;border-radius:5px;letter-spacing:-.01em;}
+  .brand:hover{background:var(--hover);}
+  .brand .emoji{font-size:17px;}
+  .brand .tld{color:var(--text-faint);font-weight:500;}
+  .side-home{display:flex;align-items:center;gap:8px;padding:5px 8px;margin-bottom:2px;border-radius:5px;
+    color:var(--text-dim);font-size:13.5px;text-decoration:none;}
+  .side-home:hover{background:var(--hover);color:var(--text);}
+  .site-nav{margin-top:6px;}
+  .site-nav details{margin:0 0 1px;}
+  .site-nav summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:7px;padding:5px 8px;
+    border-radius:5px;font-size:13px;color:var(--text-dim);font-weight:500;user-select:none;}
+  .site-nav summary::-webkit-details-marker{display:none;}
+  .site-nav summary:hover{background:var(--hover);color:var(--text);}
+  .site-nav summary .chev{font-size:9px;color:var(--text-faint);transition:transform .15s;flex:0 0 auto;}
+  .site-nav details[open] > summary .chev{transform:rotate(90deg);}
+  .site-nav summary .tnum{font-variant-numeric:tabular-nums;color:var(--text-faint);font-size:11.5px;flex:0 0 auto;}
+  .site-nav summary .tname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .site-nav .sub{padding-left:8px;margin:1px 0 4px;border-left:1px solid var(--border);margin-left:14px;}
+  .site-nav .sub a{display:block;padding:4px 8px;border-radius:5px;font-size:12.5px;color:var(--text-dim);
+    text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .site-nav .sub a:hover{background:var(--hover);color:var(--text);}
+  .site-nav .sub a.here{background:var(--hover);color:var(--text);font-weight:600;}
+  .site-nav .sub a .n{color:var(--text-faint);font-variant-numeric:tabular-nums;font-size:11.5px;margin-right:6px;}
+  .pager{display:flex;gap:12px;margin:56px 0 8px;padding-top:22px;border-top:1px solid var(--border);}
+  .pager a{flex:1;min-width:0;display:block;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);
+    text-decoration:none;color:var(--text);transition:background .12s;}
+  .pager a:hover{background:var(--hover);}
+  .pager .lbl{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-faint);
+    font-weight:600;margin-bottom:3px;}
+  .pager .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .pager .num{color:var(--text-faint);font-weight:500;font-variant-numeric:tabular-nums;}
+  .pager a.next{text-align:right;}
+  .pager a.ghost{visibility:hidden;}
+  @media (max-width:620px){ .pager{flex-direction:column;} .pager a.ghost{display:none;} }
+</style>
+
+
+<style id="practice-css">
+  .practice{border:1px solid var(--border);border-radius:var(--radius);margin:26px 0 0;
+    background:var(--sidebar);overflow:hidden;}
+  .prac-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    padding:11px 16px;border-bottom:1px solid var(--border);background:var(--bg);}
+  .prac-title{font-weight:700;font-size:13.5px;letter-spacing:-.01em;}
+  .prac-count{font-size:12.5px;color:var(--text-faint);}
+  .prac-count b{color:var(--text-dim);font-variant-numeric:tabular-nums;}
+  .lvl-switch{margin-left:auto;display:flex;gap:2px;background:var(--hover);
+    border-radius:100px;padding:2px;}
+  .lvl-switch button{border:0;background:none;font:inherit;font-size:11.5px;font-weight:600;
+    color:var(--text-dim);padding:3px 11px;border-radius:100px;cursor:pointer;line-height:1.5;}
+  .lvl-switch button.on{background:var(--bg);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.09);}
+  .prac-body{padding:4px 16px 0;}
+  .prac-group{padding:14px 0;border-bottom:1px solid var(--border);}
+  .prac-group:last-child{border-bottom:0;}
+  .prac-stem{font-size:14px;color:var(--text);margin-bottom:10px;}
+  .prac-fig{margin:0 0 12px;text-align:center;}
+  .prac-fig img{max-width:100%;height:auto;border:1px solid var(--border);
+    border-radius:5px;background:#fff;}
+  html.dark .prac-fig img{background:#f7f7f5;}
+  .prac-figdesc{font-size:12.5px;color:var(--text-dim);font-style:italic;margin:0 0 10px;}
+  .prac-q{margin:0 0 4px;padding:9px 0 2px;}
+  .q-head{display:flex;align-items:baseline;gap:9px;margin-bottom:4px;}
+  .q-no{font-weight:700;font-size:13px;font-variant-numeric:tabular-nums;color:var(--text);}
+  .q-marks{font-size:11.5px;color:var(--text-faint);font-weight:600;}
+  .q-lvl{font-size:10px;font-weight:700;letter-spacing:.04em;padding:1px 6px;border-radius:100px;
+    background:var(--hover);color:var(--text-faint);}
+  .q-lvl.as{background:var(--blue-bg);color:#2c6b8a;}
+  .q-lvl.a2{background:var(--purple-bg);color:#6a4ca8;}
+  html.dark .q-lvl.as{color:#8fc9e4;} html.dark .q-lvl.a2{color:#c3aae8;}
+  .q-text{font-size:14.5px;line-height:1.55;}
+  .q-space{height:16px;}
+  .ms{margin:10px 0 2px;padding:12px 14px;border-radius:5px;background:var(--bg);
+    border:1px solid var(--border);font-size:13.5px;line-height:1.55;}
+  .ms[hidden]{display:none;}
+  .ms ol{margin:0;padding-left:20px;}
+  .ms ol li{margin:0 0 4px;}
+  .ms .tag{display:block;margin-top:9px;padding:7px 10px;border-radius:4px;font-size:12.5px;}
+  .ms .tag b{font-weight:700;}
+  .ms .acc{background:var(--green-bg);}
+  .ms .rej{background:var(--red-bg);}
+  .ms .rul{background:var(--amber-bg);}
+  .ms .wrk{background:var(--blue-bg);}
+  .ms-ref{margin-top:9px;font-size:11.5px;color:var(--text-faint);font-family:var(--mono);}
+  .prac-foot{padding:12px 16px 14px;border-top:1px solid var(--border);background:var(--bg);}
+  .prac-reveal{font:inherit;font-size:13px;font-weight:600;padding:7px 15px;border-radius:5px;
+    border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;}
+  .prac-reveal:hover{background:var(--hover);}
+  .prac-note{font-size:11.5px;color:var(--text-faint);margin-top:9px;line-height:1.5;}
+  .prac-empty{display:none;padding:14px 16px;font-size:13px;color:var(--text-faint);}
+  @media print{ .prac-head .lvl-switch,.prac-reveal{display:none;} .ms[hidden]{display:block;} }
+</style>
+</head>
+<body>
+
+<div class="menu-btn" id="menuBtn">☰</div>
+
+<div class="app">
+  <nav class="sidebar" id="sidebar">
+    <a class="brand" href="/"><span class="emoji">&#129516;</span>biochemrevise<span class="tld">.co.uk</span></a>
+    <a class="side-home" href="/">&#8962; All topics &amp; search</a>
+    <div class="side-search" onclick="showNotes(); document.getElementById('notesTop').scrollIntoView({behavior:'smooth'});">🔍 Search this page…</div>
+
+    <div class="side-group-label">3.2.2 Notes</div>
+    <a class="side-link" data-target="s1"><span class="num">1</span> Not every cell can divide</a>
+    <a class="side-link" data-target="s2"><span class="num">2</span> The cell cycle &amp; DNA replication</a>
+    <a class="side-link" data-target="s3"><span class="num">3</span> The five stages of mitosis</a>
+    <a class="side-link" data-target="s4"><span class="num">4</span> Cytokinesis</a>
+    <a class="side-link" data-target="s5"><span class="num">5</span> Mitosis vs meiosis boundary</a>
+    <a class="side-link" data-target="s6"><span class="num">6</span> Mitosis, cancer &amp; treatment</a>
+    <a class="side-link" data-target="s7"><span class="num">7</span> Binary fission</a>
+    <a class="side-link" data-target="s8"><span class="num">8</span> Viruses &amp; cell division</a>
+    <a class="side-link" data-target="s9"><span class="num">9</span> RP2 — root-tip squash</a>
+    <a class="side-link" data-target="s10"><span class="num">10</span> Calculating actual cell size</a>
+    <a class="side-link" data-target="s11"><span class="num">11</span> Common mistakes</a>
+    <a class="side-link" data-target="s12"><span class="num">12</span> Using this in longer answers</a>
+    <a class="side-link" data-target="s13"><span class="num">13</span> Links, memory hook &amp; checklist</a>
+
+    <div class="side-group-label">AI study tools · demo</div>
+    <div class="side-tool" data-tool="tutor">🧑‍🏫 Tutor AI</div>
+    <div class="side-tool" data-tool="blurt">🧠 Blurt AI</div>
+    <div class="side-tool" data-tool="feynman">🎤 Feynman AI</div>
+    <a class="side-link" data-target="notesTop" style="margin-top:2px;">📄 Back to notes</a>
+
+    <div class="side-group-label">All notes</div>
+    <div class="site-nav">
+    <details>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.1</span><span class="tname">Biological molecules</span></summary>
+    <div class="sub">
+    <a href="/notes/3-1-1-monomers-and-polymers"><span class="n">3.1.1</span>Monomers and Polymers</a>
+    <a href="/notes/3-1-2-carbohydrates"><span class="n">3.1.2</span>Carbohydrates</a>
+    <a href="/notes/3-1-3-lipids"><span class="n">3.1.3</span>Lipids</a>
+    <a href="/notes/3-1-4-1-general-properties-of-proteins"><span class="n">3.1.4.1</span>General Properties of Proteins</a>
+    <a href="/notes/3-1-4-2-many-proteins-are-enzymes"><span class="n">3.1.4.2</span>Many Proteins Are Enzymes</a>
+    <a href="/notes/3-1-5-1-structure-of-dna-and-rna"><span class="n">3.1.5.1</span>Structure of DNA and RNA</a>
+    <a href="/notes/3-1-5-2-dna-replication"><span class="n">3.1.5.2</span>DNA Replication</a>
+    <a href="/notes/3-1-6-atp"><span class="n">3.1.6</span>ATP</a>
+    <a href="/notes/3-1-7-water"><span class="n">3.1.7</span>Water</a>
+    <a href="/notes/3-1-8-inorganic-ions"><span class="n">3.1.8</span>Inorganic Ions</a>
+    </div></details>
+    <details open>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.2</span><span class="tname">Cells</span></summary>
+    <div class="sub">
+    <a href="/notes/3-2-1-1-structure-of-eukaryotic-cells"><span class="n">3.2.1.1</span>Structure of Eukaryotic Cells</a>
+    <a href="/notes/3-2-1-2-structure-of-prokaryotic-cells-and-of-viruses"><span class="n">3.2.1.2</span>Structure of Prokaryotic Cells and of Viruses</a>
+    <a href="/notes/3-2-1-3-methods-of-studying-cells"><span class="n">3.2.1.3</span>Methods of Studying Cells</a>
+    <a href="/notes/3-2-2-all-cells-arise-from-other-cells" class="here"><span class="n">3.2.2</span>All Cells Arise From Other Cells</a>
+    <a href="/notes/3-2-3-transport-across-cell-membranes"><span class="n">3.2.3</span>Transport Across Cell Membranes</a>
+    <a href="/notes/3-2-4-cell-recognition-and-the-immune-system"><span class="n">3.2.4</span>Cell Recognition and the Immune System</a>
+    </div></details>
+    <details>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.3</span><span class="tname">Exchange</span></summary>
+    <div class="sub">
+    <a href="/notes/3-3-1-surface-area-to-volume-ratio"><span class="n">3.3.1</span>Surface Area to Volume Ratio</a>
+    <a href="/notes/3-3-2-gas-exchange"><span class="n">3.3.2</span>Gas Exchange</a>
+    <a href="/notes/3-3-3-digestion-and-absorption"><span class="n">3.3.3</span>Digestion and Absorption</a>
+    <a href="/notes/3-3-4-1-mass-transport-in-animals"><span class="n">3.3.4.1</span>Mass Transport in Animals</a>
+    <a href="/notes/3-3-4-2-mass-transport-in-plants"><span class="n">3.3.4.2</span>Mass Transport in Plants</a>
+    </div></details>
+    <details>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.4</span><span class="tname">Genetic information &amp; variation</span></summary>
+    <div class="sub">
+    <a href="/notes/3-4-1-dna-genes-and-chromosomes"><span class="n">3.4.1</span>DNA, Genes and Chromosomes</a>
+    <a href="/notes/3-4-2-dna-and-protein-synthesis"><span class="n">3.4.2</span>DNA and Protein Synthesis</a>
+    <a href="/notes/3-4-3-genetic-diversity-mutation-and-meiosis"><span class="n">3.4.3</span>Genetic Diversity, Mutation and Meiosis</a>
+    <a href="/notes/3-4-4-genetic-diversity-and-adaptation"><span class="n">3.4.4</span>Genetic Diversity and Adaptation</a>
+    <a href="/notes/3-4-5-species-and-taxonomy"><span class="n">3.4.5</span>Species and Taxonomy</a>
+    <a href="/notes/3-4-6-biodiversity-within-a-community"><span class="n">3.4.6</span>Biodiversity Within a Community</a>
+    <a href="/notes/3-4-7-investigating-diversity"><span class="n">3.4.7</span>Investigating Diversity</a>
+    </div></details>
+    <details>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.5</span><span class="tname">Energy transfers</span></summary>
+    <div class="sub">
+    <a href="/notes/3-5-1-photosynthesis"><span class="n">3.5.1</span>Photosynthesis</a>
+    <a href="/notes/3-5-2-respiration"><span class="n">3.5.2</span>Respiration</a>
+    <a href="/notes/3-5-3-energy-and-ecosystems"><span class="n">3.5.3</span>Energy and Ecosystems</a>
+    <a href="/notes/3-5-4-nutrient-cycles"><span class="n">3.5.4</span>Nutrient Cycles</a>
+    </div></details>
+    <details>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.6</span><span class="tname">Responding to change</span></summary>
+    <div class="sub">
+    <a href="/notes/3-6-1-1-survival-and-response"><span class="n">3.6.1.1</span>Survival and Response</a>
+    <a href="/notes/3-6-1-2-receptors"><span class="n">3.6.1.2</span>Receptors</a>
+    <a href="/notes/3-6-1-3-control-of-heart-rate"><span class="n">3.6.1.3</span>Control of Heart Rate</a>
+    <a href="/notes/3-6-2-1-nerve-impulses"><span class="n">3.6.2.1</span>Nerve Impulses</a>
+    <a href="/notes/3-6-2-2-synaptic-transmission"><span class="n">3.6.2.2</span>Synaptic Transmission</a>
+    <a href="/notes/3-6-3-skeletal-muscles"><span class="n">3.6.3</span>Skeletal Muscles as Effectors</a>
+    <a href="/notes/3-6-4-1-principles-of-homeostasis-and-negative-feedback"><span class="n">3.6.4.1</span>Principles of Homeostasis and Negative Feedback</a>
+    <a href="/notes/3-6-4-2-control-of-blood-glucose-concentration"><span class="n">3.6.4.2</span>Control of Blood Glucose Concentration</a>
+    <a href="/notes/3-6-4-3-control-of-blood-water-potential"><span class="n">3.6.4.3</span>Control of Blood Water Potential</a>
+    </div></details>
+    <details>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.7</span><span class="tname">Genetics &amp; ecosystems</span></summary>
+    <div class="sub">
+    <a href="/notes/3-7-1-inheritance"><span class="n">3.7.1</span>Inheritance</a>
+    <a href="/notes/3-7-2-populations"><span class="n">3.7.2</span>Populations</a>
+    <a href="/notes/3-7-3-evolution-may-lead-to-speciation"><span class="n">3.7.3</span>Evolution May Lead to Speciation</a>
+    <a href="/notes/3-7-4-populations-in-ecosystems"><span class="n">3.7.4</span>Populations in Ecosystems</a>
+    </div></details>
+    <details>
+    <summary><span class="chev">&#9654;</span><span class="tnum">3.8</span><span class="tname">Control of gene expression</span></summary>
+    <div class="sub">
+    <a href="/notes/3-8-1-alteration-of-the-sequence-of-bases-in-dna"><span class="n">3.8.1</span>Alteration of the Sequence of Bases in DNA</a>
+    <a href="/notes/3-8-2-1-most-of-a-cells-dna-is-not-translated"><span class="n">3.8.2.1</span>Most of a Cell&#x27;s DNA is Not Translated</a>
+    <a href="/notes/3-8-2-2-regulation-of-transcription-and-translation"><span class="n">3.8.2.2</span>Regulation of Transcription and Translation</a>
+    <a href="/notes/3-8-2-3-gene-expression-and-cancer"><span class="n">3.8.2.3</span>Gene Expression and Cancer</a>
+    <a href="/notes/3-8-3-using-genome-projects"><span class="n">3.8.3</span>Using Genome Projects</a>
+    <a href="/notes/3-8-4-1-recombinant-dna-technology"><span class="n">3.8.4.1</span>Recombinant DNA Technology</a>
+    <a href="/notes/3-8-4-2-dna-probes-and-screening"><span class="n">3.8.4.2</span>DNA Probes, Screening &amp; Personalised Medicine</a>
+    <a href="/notes/3-8-4-3-genetic-fingerprinting"><span class="n">3.8.4.3</span>Genetic Fingerprinting</a>
+    </div></details>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="darkmode-toggle" id="darkToggle">🌓 Toggle dark mode</div>
+      No account, no server — everything on this page runs in your browser and nothing is saved when you close the tab.
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <div class="mode-bar">
+      <button class="mode-tab active" data-mode="notes">📖 Full notes</button>
+      <button class="mode-tab" data-mode="cram">⚡ 5-min cram</button>
+      <button class="mode-tab" data-mode="drill">🎯 Markscheme-wording drill</button>
+    </div>
+
+    <div id="notesView">
+      <div class="breadcrumb" id="notesTop"><a href="/" style="color:inherit;text-decoration:none;">Biology</a> &nbsp;&rsaquo;&nbsp; A-level &nbsp;&rsaquo;&nbsp; <a href="/#t3-2" style="color:inherit;text-decoration:none;">3.2 Cells</a> &nbsp;&rsaquo;&nbsp; 3.2.2</div>
+      <div class="page-emoji">🧬</div>
+      <h1 class="page-title">All Cells Arise From Other Cells</h1>
+      <p class="subtitle">How a eukaryotic cell divides by mitosis, why that division has to stay tightly controlled, how a prokaryotic cell divides by the simpler process of binary fission, and how the root-tip squash practical puts a number on how fast a tissue is dividing.</p>
+      <div class="meta-row">
+        <span class="pill">A-level Biology</span>
+        <span class="pill">Topic 3.2.2</span>
+        <span class="pill">13 sections</span>
+        <span class="pill">2 diagrams</span>
+        <span class="pill">3 AI study tools</span>
+        <span class="pill">12 exam questions</span>
+      </div>
+
+      <div class="toc-grid">
+        <div class="toc-item" data-jump="s1"><span class="n">1</span> Not every cell can divide</div>
+        <div class="toc-item" data-jump="s2"><span class="n">2</span> The cell cycle &amp; DNA replication</div>
+        <div class="toc-item" data-jump="s3"><span class="n">3</span> The five stages of mitosis</div>
+        <div class="toc-item" data-jump="s4"><span class="n">4</span> Cytokinesis</div>
+        <div class="toc-item" data-jump="s5"><span class="n">5</span> Mitosis vs meiosis boundary</div>
+        <div class="toc-item" data-jump="s6"><span class="n">6</span> Mitosis, cancer &amp; treatment</div>
+        <div class="toc-item" data-jump="s7"><span class="n">7</span> Binary fission</div>
+        <div class="toc-item" data-jump="s8"><span class="n">8</span> Viruses &amp; cell division</div>
+        <div class="toc-item" data-jump="s9"><span class="n">9</span> RP2 — root-tip squash</div>
+        <div class="toc-item" data-jump="s10"><span class="n">10</span> Calculating actual cell size</div>
+        <div class="toc-item" data-jump="s11"><span class="n">11</span> Common mistakes</div>
+        <div class="toc-item" data-jump="s12"><span class="n">12</span> Using this in longer answers</div>
+        <div class="toc-item" data-jump="s13"><span class="n">13</span> Links, memory hook &amp; checklist</div>
+      </div>
+
+      <div class="callout trap">
+        <div class="ic">⚠️</div>
+        <div><p><strong>The single rule that costs the most marks on this spec point:</strong> in mitosis it is always <strong>sister chromatids</strong> (identical copies) that separate — never write "homologous chromosomes separate," since that's meiosis-only vocabulary. A close second: interphase is not "a stage of mitosis" — it's a stage of the wider cell cycle that happens <em>before</em> mitosis begins.</p></div>
+      </div>
+
+      <!-- ================= SECTION 1 ================= -->
+      <section class="spec-section" id="s1">
+        <div class="sec-eyebrow">Section 1 · spec content point</div>
+        <h2 class="sec-title"><span class="icon">🌱</span> Not every cell keeps the ability to divide</h2>
+        <p class="lede">This one-sentence spec point is easy to skim past, but it's the reason a root tip has far more actively dividing cells than a leaf, and it sets up why the mitotic index (Section 9) varies so much between tissues.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "Within multicellular organisms, not all cells retain the ability to divide."</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s1">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s1" data-level="1" style="display:none;">
+          <p>Imagine a factory where most workers get trained for one very specific job and then stay on that job forever — they never go back to "general training." But a small number of workers stay in the training pool permanently, ready to become whatever kind of worker is needed next, including making brand-new workers. Most cells in your body are like the specialised workers — once they've become a nerve cell or a red blood cell, they don't divide again. Only a few special groups of cells stay in the "training pool" and keep dividing.</p>
+          <ul class="tidy">
+            <li><strong>Specialised, non-dividing cell</strong> = like the trained-for-one-job worker</li>
+            <li><strong>Cell that keeps dividing</strong> = like a worker still in the training pool</li>
+          </ul>
+        </div>
+        <div class="level-block" data-group="s1" data-level="2" style="display:none;">
+          <p>As cells become more specialised — a process called <strong>differentiation</strong> — most permanently lose the ability to divide again. A mature red blood cell, most neurones, and mature xylem vessels never divide once they've reached their final, specialised form. Only certain cells or tissues keep dividing throughout an organism's life: in plants this is the <strong>meristem</strong> (found at root tips and shoot tips), and in animals it's certain <strong>stem-cell</strong> populations, such as those in bone marrow or the base of the skin and gut lining.</p>
+        </div>
+        <div class="level-block" data-group="s1" data-level="3">
+        <p>Once a cell has fully <mark class="credit">differentiated</mark> into a specialised type — a mature red blood cell, most neurones, xylem vessels — it typically loses the ability to divide again permanently. The cells that <em>do</em> retain that ability are concentrated in specific dividing tissues:</p>
+        <ul class="tidy">
+          <li><strong>Meristems</strong> in plants — undifferentiated, permanently dividing tissue found at root tips and shoot tips. This is exactly the tissue Required Practical 2 (Section 9) samples, because it's where mitosis is most concentrated and easiest to catch in the act.</li>
+          <li><strong>Stem cells</strong> in animals — e.g. in bone marrow (producing blood cells), and in the basal layers of skin and gut epithelium (continually replacing worn-out cells).</li>
+        </ul>
+        <p>This distinction is why a mitotic index (the proportion of cells actively dividing in a sample) differs so much between tissues: a sample taken from the root-tip meristem will have a far higher mitotic index than one taken from a fully differentiated region further up the root.</p>
+
+        <div class="callout tip">
+          <div class="ic">📌</div>
+          <div><p>Don't confuse "not all cells retain the ability to divide" with an organism's ability to reproduce sexually — that relies on a completely separate, specialised division process (meiosis, in the gonads only) covered elsewhere on the spec, not on this general mitotic-division rule.</p></div>
+        </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 2 ================= -->
+      <section class="spec-section" id="s2">
+        <div class="sec-eyebrow">Section 2 · spec content point</div>
+        <h2 class="sec-title"><span class="icon">🔁</span> The cell cycle &amp; where DNA replication happens</h2>
+        <p class="lede">The cycle has two very unequal chunks: a long interphase (growth, organelle increase, and — critically — DNA replication) and a much shorter division phase. Reading a DNA-content-against-time graph correctly depends entirely on knowing which chunk is which.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "Eukaryotic cells that do retain the ability to divide show a cell cycle. DNA replication occurs during the interphase of the cell cycle. Mitosis is the part of the cell cycle in which a eukaryotic cell divides to produce two daughter cells, each with the identical copies of DNA produced by the parent cell during DNA replication."</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s2">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s2" data-level="1" style="display:none;">
+          <p>Think of the cell cycle like preparing to split a stack of paperwork between two people fairly. First you spend a long time photocopying every page so there are two full copies of everything (this is like interphase — the cell is growing and copying its DNA). Only once every page is copied do you actually split the two piles apart and hand one to each person — that quick splitting-up bit is mitosis.</p>
+        </div>
+        <div class="level-block" data-group="s2" data-level="2" style="display:none;">
+          <p>The cell cycle is a repeating loop with two very different-sized parts. <strong>Interphase</strong> is the long part: the cell grows, makes more organelles, and — crucially — copies (<strong>replicates</strong>) its DNA. <strong>Mitosis</strong> is the short part: the cell actually splits its copied DNA between two new cells, each getting an identical set. Interphase itself has three named sub-stages: <strong>G1</strong> (growth), <strong>S</strong> (DNA replication happens here specifically), and <strong>G2</strong> (further growth and final checks before dividing).</p>
+        </div>
+        <div class="level-block" data-group="s2" data-level="3">
+        <p>Not every cell in a multicellular organism keeps the ability to divide (Section 1) — but those that do go through a repeating <strong>cell cycle</strong>. The cycle has two unequal chunks: a long <strong>interphase</strong> (growth, organelle increase, and DNA replication), then the much shorter division phase, <strong>mitosis</strong> (M-phase), usually followed straight away by cytokinesis (Section 4). Interphase is often split into <strong>G1</strong> (growth), <strong>S</strong> (the sub-stage where DNA replicates), and <strong>G2</strong> (further growth and checks before division) — the spec's own wording just says "interphase," but knowing the S-phase sub-stage matters for reading a DNA-content graph.</p>
+
+        <div class="diagram-card">
+          <svg viewBox="0 0 620 220" width="100%" role="img" aria-label="Graph of DNA content per cell against time across one cell cycle">
+            <text x="310" y="16" text-anchor="middle" font-size="12" fill="var(--text-faint)">DNA content per cell, over one full cell cycle</text>
+            <line x1="55" y1="20" x2="55" y2="180" stroke="var(--text-faint)" stroke-width="1"/>
+            <line x1="55" y1="180" x2="600" y2="180" stroke="var(--text-faint)" stroke-width="1"/>
+            <text x="20" y="70" font-size="10.5" fill="var(--text-dim)" transform="rotate(-90 20 70)">DNA content</text>
+            <text x="320" y="205" text-anchor="middle" font-size="10.5" fill="var(--text-dim)">Time →</text>
+            <line x1="55" y1="70" x2="600" y2="70" stroke="var(--text-faint)" stroke-dasharray="3 3"/>
+            <text x="558" y="63" font-size="9.5" fill="var(--text-faint)">doubled</text>
+            <line x1="55" y1="150" x2="600" y2="150" stroke="var(--text-faint)" stroke-dasharray="3 3"/>
+            <text x="558" y="143" font-size="9.5" fill="var(--text-faint)">original</text>
+            <polyline points="55,150 150,150 260,70 430,70 460,150 600,150" fill="none" stroke="#2383e2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="60" y="185" width="90" height="14" fill="var(--blue-bg)"/>
+            <text x="105" y="196" text-anchor="middle" font-size="9.5" fill="var(--blue-line)">G1</text>
+            <rect x="150" y="185" width="110" height="14" fill="var(--amber-bg)"/>
+            <text x="205" y="196" text-anchor="middle" font-size="9.5" fill="var(--amber-text)">S (replication)</text>
+            <rect x="260" y="185" width="170" height="14" fill="var(--blue-bg)"/>
+            <text x="345" y="196" text-anchor="middle" font-size="9.5" fill="var(--blue-line)">G2</text>
+            <rect x="430" y="185" width="30" height="14" fill="var(--green-bg)"/>
+            <text x="445" y="196" text-anchor="middle" font-size="8.5" fill="var(--green-text)">M</text>
+            <rect x="460" y="185" width="140" height="14" fill="var(--blue-bg)"/>
+            <text x="530" y="196" text-anchor="middle" font-size="9.5" fill="var(--blue-line)">G1 (next cycle)</text>
+            <line x1="430" y1="70" x2="430" y2="150" stroke="var(--red-line)" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <text x="470" y="115" font-size="9" fill="var(--red-text)">sudden fall only at telophase/</text>
+            <text x="470" y="127" font-size="9" fill="var(--red-text)">cytokinesis — not before</text>
+          </svg>
+          <div class="diagram-cap">Interphase (G1, S, G2) is by far the longest part of the cycle — flat or rising. Only the actual division of the cell (telophase/cytokinesis) causes DNA content per cell to fall.</div>
+        </div>
+
+        <h3 class="sub-title">Reading a DNA-content-against-time graph</h3>
+        <ul class="tidy">
+          <li>A flat, low section of the graph is interphase before S phase — DNA content stays constant.</li>
+          <li>A rising section is S phase — DNA is actively replicating.</li>
+          <li>A flat, high (doubled) section covers G2, prophase, metaphase and anaphase — every chromosome has already been duplicated into 2 sister chromatids, so the total DNA content per cell stays at its doubled value right up until division actually happens.</li>
+          <li>A <strong>sudden fall</strong> in DNA content means the cell has physically finished dividing — that's telophase/cytokinesis, because DNA has now been shared out between two daughter cells.</li>
+        </ul>
+
+        <details class="toggle flag">
+          <summary><span class="caret">▶</span> 🚩 Trap — naming the falling section</summary>
+          <div class="body">
+            <p>Never name "prophase," "metaphase," or "anaphase" alone for the falling section of a DNA-content graph — DNA content doesn't drop until the cell physically divides. The earlier stages just redistribute DNA that's already been copied; they don't reduce the amount per cell. Only telophase/cytokinesis produces the actual fall.</p>
+          </div>
+        </details>
+        <details class="toggle flag">
+          <summary><span class="caret">▶</span> 🚩 Trap — "chromosomes replicate" isn't precise enough</summary>
+          <div class="body">
+            <p>For a mark that asks what happens to cause doubled DNA content, the precise term needed is that <strong>the DNA replicates</strong> — "chromosomes replicate" on its own is not accepted as precise enough. Doubled DNA content is true from late interphase (after S phase) all the way through to anaphase, because by then each chromosome consists of 2 sister chromatids; original (un-doubled) DNA content means either replication hasn't happened yet (early interphase/G1), or the cell has just divided and started the next interphase.</p>
+          </div>
+        </details>
+        <details class="toggle">
+          <summary><span class="caret">▶</span> Finding the length of the cell cycle from a graph</summary>
+          <div class="body">
+            <p>Measure the time between two successive <em>starts</em> (or two successive <em>ends</em>) of DNA replication on the graph — not the gap between two random points, and not just the length of one named stage. This works because DNA replication happens exactly once per cell cycle, so the shape of the curve repeats with a period equal to the cycle length.</p>
+          </div>
+        </details>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 3 ================= -->
+      <section class="spec-section" id="s3">
+        <div class="sec-eyebrow">Section 3 · spec content point</div>
+        <h2 class="sec-title"><span class="icon">🧫</span> The five stages of mitosis &amp; the role of spindle fibres</h2>
+        <p class="lede">IPMAT — Interphase, Prophase, Metaphase, Anaphase, Telophase — always in that order. Every mark on this page is stage-name plus correctly attached event: the biology has to be pinned to the right label, or it scores nothing even if it's true.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "The behaviour of chromosomes during interphase, prophase, metaphase, anaphase and telophase of mitosis. The role of spindle fibres attached to centromeres in the separation of chromatids."</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s3">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s3" data-level="1" style="display:none;">
+          <p>Picture packing up to move to two new houses. First you pack every box neatly and label it (prophase — chromosomes condense so they're easy to handle). Then every box gets lined up in the hallway in one straight row so nothing gets mixed up (metaphase). Then each labelled pair of matching boxes splits into two single boxes, and one of each pair heads to house A while the other heads to house B (anaphase). Finally, house A and house B both get properly unpacked and settled (telophase).</p>
+        </div>
+        <div class="level-block" data-group="s3" data-level="2" style="display:none;">
+          <p>Mitosis has four working stages after interphase: <strong>prophase</strong> (the DNA, already copied in interphase, coils up tightly into visible chromosomes, and the membrane around the nucleus breaks down), <strong>metaphase</strong> (the chromosomes line up along the middle of the cell), <strong>anaphase</strong> (the two identical halves of each chromosome — called sister chromatids — get pulled apart to opposite ends of the cell), and <strong>telophase</strong> (a new membrane forms around each new set, and the DNA relaxes again). Throughout, thread-like <strong>spindle fibres</strong> attach to a point on each chromosome called the centromere, and it's these fibres doing the pulling in anaphase.</p>
+        </div>
+        <div class="level-block" data-group="s3" data-level="3">
+        <table class="compare">
+          <tr><th>Stage</th><th>Nuclear envelope / spindle</th><th>What happens to the chromosomes</th></tr>
+          <tr><td><strong>Interphase</strong></td><td>Envelope intact; no spindle.</td><td>Not part of mitosis itself — DNA replicates (S phase); each chromosome becomes 2 identical sister chromatids joined at a centromere. Chromosomes not yet visible as distinct structures.</td></tr>
+          <tr><td><strong>Prophase</strong></td><td>Envelope <mark class="credit">breaks down</mark>; spindle starts forming.</td><td>Chromosomes <mark class="credit">condense</mark> (become visible), each seen as 2 sister chromatids joined at one centromere.</td></tr>
+          <tr><td><strong>Metaphase</strong></td><td>No envelope; spindle complete.</td><td>Chromosomes line up at the <mark class="credit">equator</mark> (metaphase plate); spindle fibres attach to <mark class="credit">centromeres</mark>.</td></tr>
+          <tr><td><strong>Anaphase</strong></td><td>No envelope; spindle fibres shorten.</td><td><mark class="credit">Centromeres divide</mark>; spindle fibres pull sister chromatids (now individual chromosomes) to <mark class="credit">opposite poles</mark>.</td></tr>
+          <tr><td><strong>Telophase</strong> (+ cytokinesis)</td><td>Envelope reforms around each set; spindle breaks down.</td><td>Chromosomes decondense at each pole; cytoplasm divides (Section 4), usually producing 2 new, genetically identical cells.</td></tr>
+        </table>
+
+        <div class="diagram-card">
+          <div class="stepper-wrap" style="border:none;padding:0;background:transparent;margin-bottom:0;">
+            <div class="stepper-caption" id="mitStepCaption"></div>
+            <div class="stepper-nav">
+              <button class="btn" id="mitStepPrev">← Back</button>
+              <button class="btn primary" id="mitStepNext">Next stage →</button>
+              <span class="step-indicator" id="mitStepIndicator"></span>
+            </div>
+          </div>
+          <div class="stage-row" id="stageRow">
+            <div class="stage-mini" data-i="0">
+              <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="var(--border)" stroke-width="2"/>
+                <path d="M30 40 q6 -4 8 4 q-8 6 -4 10" stroke="var(--text-faint)" stroke-width="1.3" fill="none"/>
+                <path d="M60 55 q-6 4 -4 10 q8 -2 6 -8" stroke="var(--text-faint)" stroke-width="1.3" fill="none"/>
+                <path d="M45 65 q4 6 -2 8" stroke="var(--text-faint)" stroke-width="1.3" fill="none"/>
+                <path d="M55 35 q4 -6 -2 -8" stroke="var(--text-faint)" stroke-width="1.3" fill="none"/>
+              </svg>
+              <div class="stage-name">Interphase</div><div class="stage-count">chromatin, not visible</div>
+            </div>
+            <div class="stage-mini" data-i="1">
+              <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="var(--border)" stroke-width="2" stroke-dasharray="4 3"/>
+                <path d="M32 35 l8 8 M40 35 l-8 8" stroke="var(--amber-line)" stroke-width="2"/>
+                <path d="M62 32 l8 8 M70 32 l-8 8" stroke="var(--amber-line)" stroke-width="2"/>
+                <path d="M30 62 l8 8 M38 62 l-8 8" stroke="var(--amber-line)" stroke-width="2"/>
+                <path d="M65 63 l8 8 M73 63 l-8 8" stroke="var(--amber-line)" stroke-width="2"/>
+              </svg>
+              <div class="stage-name">Prophase</div><div class="stage-count">4 chromosomes (X-shapes)</div>
+            </div>
+            <div class="stage-mini" data-i="2">
+              <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="var(--border)" stroke-width="2"/>
+                <line x1="18" y1="50" x2="82" y2="50" stroke="var(--green-line)" stroke-width="1" stroke-dasharray="2 2"/>
+                <path d="M27 44 l6 6 M33 44 l-6 6" stroke="var(--amber-line)" stroke-width="2"/>
+                <path d="M40 44 l6 6 M46 44 l-6 6" stroke="var(--amber-line)" stroke-width="2"/>
+                <path d="M54 44 l6 6 M60 44 l-6 6" stroke="var(--amber-line)" stroke-width="2"/>
+                <path d="M67 44 l6 6 M73 44 l-6 6" stroke="var(--amber-line)" stroke-width="2"/>
+              </svg>
+              <div class="stage-name">Metaphase</div><div class="stage-count">4 lined up at equator</div>
+            </div>
+            <div class="stage-mini" data-i="3">
+              <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="var(--border)" stroke-width="2"/>
+                <line x1="25" y1="40" x2="25" y2="60" stroke="var(--red-line)" stroke-width="2"/>
+                <line x1="30" y1="35" x2="30" y2="65" stroke="var(--red-line)" stroke-width="2"/>
+                <line x1="35" y1="42" x2="35" y2="58" stroke="var(--red-line)" stroke-width="2"/>
+                <line x1="40" y1="38" x2="40" y2="62" stroke="var(--red-line)" stroke-width="2"/>
+                <line x1="60" y1="38" x2="60" y2="62" stroke="var(--red-line)" stroke-width="2"/>
+                <line x1="65" y1="42" x2="65" y2="58" stroke="var(--red-line)" stroke-width="2"/>
+                <line x1="70" y1="35" x2="70" y2="65" stroke="var(--red-line)" stroke-width="2"/>
+                <line x1="75" y1="40" x2="75" y2="60" stroke="var(--red-line)" stroke-width="2"/>
+              </svg>
+              <div class="stage-name">Anaphase</div><div class="stage-count">8 chromatids pulled apart</div>
+            </div>
+            <div class="stage-mini" data-i="4">
+              <svg viewBox="0 0 100 100">
+                <circle cx="27" cy="50" r="20" fill="none" stroke="var(--green-line)" stroke-width="2"/>
+                <circle cx="73" cy="50" r="20" fill="none" stroke="var(--green-line)" stroke-width="2"/>
+                <line x1="47" y1="50" x2="53" y2="50" stroke="var(--text-faint)" stroke-width="1.5" stroke-dasharray="2 2"/>
+                <circle cx="22" cy="45" r="1.6" fill="var(--text-dim)"/><circle cx="32" cy="45" r="1.6" fill="var(--text-dim)"/>
+                <circle cx="22" cy="55" r="1.6" fill="var(--text-dim)"/><circle cx="32" cy="55" r="1.6" fill="var(--text-dim)"/>
+                <circle cx="68" cy="45" r="1.6" fill="var(--text-dim)"/><circle cx="78" cy="45" r="1.6" fill="var(--text-dim)"/>
+                <circle cx="68" cy="55" r="1.6" fill="var(--text-dim)"/><circle cx="78" cy="55" r="1.6" fill="var(--text-dim)"/>
+              </svg>
+              <div class="stage-name">Telophase</div><div class="stage-count">4 + 4 in two new cells</div>
+            </div>
+          </div>
+          <div class="diagram-cap">Chromosomes are tracked by count at every stage: 4 chromosomes → 4 visible pairs of chromatids (prophase &amp; metaphase) → 8 individual chromatids separating (anaphase) → 4 + 4 in the two finished daughter cells (telophase). Click a stage, or use Next/Back, to step through — the single most examiner-reported drawing error on this spec point is getting this count wrong.</div>
+        </div>
+
+        <div class="callout trap" style="margin-top:14px;">
+          <div class="ic">⚠️</div>
+          <div><p><strong>The rule that costs the most marks:</strong> a "describe the stages of mitosis" answer is marked as five stage-by-stage pairs — getting a stage name wrong caps that whole part of the answer (errors aren't carried forward within a stage's own description). Name the stage right first, then describe it.</p></div>
+        </div>
+
+        <h3 class="sub-title">Naming a stage from an image, and explaining it</h3>
+        <p>Identify <strong>anaphase</strong> from chromatids visibly being pulled apart toward opposite poles. To explain it fully: identical (sister) chromatids separate, and move to opposite poles. Any reference to the chromatids being identical is accepted — e.g. "same DNA" — but "homologous chromosomes separate" is never credited here; homologous pairs separate only in meiosis I, a different topic entirely.</p>
+
+        <h3 class="sub-title">The effect of a drug that disrupts the spindle</h3>
+        <p>These questions are mark-paired: a cause must be linked explicitly to its consequence, never left to stand alone.</p>
+        <ul class="tidy">
+          <li>No spindle fibres form or attach to centromeres → chromosomes can't line up at the equator → <strong>no metaphase</strong>.</li>
+          <li>No spindle fibres to pull chromatids apart → <strong>no anaphase</strong> (no separation of chromatids).</li>
+          <li>Fuller version: mitosis can't complete, so no new cells are added; if separation fails only partially, chromatids can end up unevenly distributed — <strong>non-disjunction</strong> — with one daughter cell gaining extra chromosomes and the other losing them (never a cell left with zero chromosomes).</li>
+        </ul>
+
+        <details class="toggle">
+          <summary><span class="caret">▶</span> Try one yourself — spindle-poison scenario</summary>
+          <div class="body">
+            <p><strong>Scenario:</strong> a chemical prevents spindle fibres from ever attaching to centromeres. Predict the effect on a dividing cell.</p>
+            <p><strong>Reasoning:</strong> without spindle fibres attached to centromeres, chromosomes cannot be pulled to line up at the equator, so the cell cannot progress into metaphase. Since anaphase depends on spindle fibres shortening to separate sister chromatids, that step also cannot occur — the cell cannot complete mitosis, so no new cells are produced, and the cell is likely to remain arrested indefinitely.</p>
+          </div>
+        </details>
+        </div>
+      
+        <div class="practice"><div class="prac-head"><span class="prac-title">&#9997;&#65039; Exam-style practice</span><span class="prac-count"><b data-prac-count>3</b> questions &middot; <b data-prac-marks>10</b> marks</span><div class="lvl-switch" role="group" aria-label="Which paper"><button type="button" data-lvl="all" class="on">Both</button><button type="button" data-lvl="AS">AS</button><button type="button" data-lvl="A2">A2</button></div></div><div class="prac-empty">No questions at this level for this section &mdash; switch to <b>Both</b> to see them all.</div><div class="prac-body"><div class="prac-group" data-level="AS"><div class="prac-stem">Figure 1 shows three stages of mitosis in a plant cell, in the order in which they occur.</div><figure class="prac-fig"><img src="/notes/figures/3-2-2-all-cells-arise-from-other-cells-as-fig1.png" alt="Figure 1 shows prophase (C), metaphase (D) and anaphase (E)." width="690" height="390" loading="lazy"></figure><div class="prac-q" data-marks="5"><div class="q-head"><span class="q-no">1</span><span class="q-marks">5 marks</span><span class="q-lvl as">AS</span></div><div class="q-text">Name the stages labelled C, D and E, and describe what happens at each.</div><div class="q-space"></div><div class="ms" hidden><ol><li>C = prophase and D = metaphase and E = anaphase</li><li>(In) prophase, chromosomes condense</li><li>(In) prophase OR metaphase, centromeres attach to spindle fibres</li><li>(In) metaphase, chromosomes / pairs of chromatids at the equator / centre of the spindle / cell</li><li>(In) anaphase, centromeres divide</li><li>(In) anaphase, chromatids (from each pair) pulled to (opposite) poles / ends of the cell</li><li>(In) prophase / metaphase / anaphase, spindle fibres shorten</li></ol><span class="tag acc"><b>Accept / ignore.</b> Accept chromatin for “chromosomes”, and shorten and thicken for “condense”. Accept letters for stages as identified in point 1. Accept contract for “shorten”. Accept chromosomes for “chromatids”.</span><span class="tag rej"><b>Reject.</b> Homologous chromosomes — in mitosis it is sister chromatids that separate.</span><span class="tag rul"><b>Examiner rule.</b> Do not carry forward an error from point 1 — the later marks are awarded on the correct stage names.</span><div class="ms-ref">AQA mark scheme &middot; 7402/1 Nov21 06.2</div></div></div></div><div class="prac-group" data-level="AS"><div class="prac-stem">A drug used in cancer treatment prevents spindle fibres from forming.</div><div class="prac-q" data-marks="3"><div class="q-head"><span class="q-no">2.1</span><span class="q-marks">3 marks</span><span class="q-lvl as">AS</span></div><div class="q-text">Explain how this drug stops a cell dividing.</div><div class="q-space"></div><div class="ms" hidden><ol><li>Stops anaphase / cell division / mitosis</li><li>(By) stopping / disrupting spindle fibres forming / attaching / pulling</li><li>Preventing separation of (sister) chromatids</li><li>(So) no new cells added (to the tissue)</li></ol><span class="tag acc"><b>Accept / ignore.</b> Accept “prevents telophase / cytokinesis”. Accept “chromatids split”. Ignore “affects anaphase”, and ignore “chromosomes separate / split”.</span><span class="tag rul"><b>Examiner rule.</b> 3 max.</span><div class="ms-ref">AQA mark scheme &middot; 7401/2 Jun18 05.5</div></div></div><div class="prac-q" data-marks="2"><div class="q-head"><span class="q-no">2.2</span><span class="q-marks">2 marks</span><span class="q-lvl as">AS</span></div><div class="q-text">A second drug binds to centromeres so that they cannot attach to the spindle. Explain the effect of this drug.</div><div class="q-space"></div><div class="ms" hidden><ol><li>Chromosomes / centromeres cannot attach (to the spindle) OR chromosomes cannot line up (on the spindle)</li><li>(So, no) metaphase</li><li>OR chromatids cannot separate (on the spindle)</li><li>(So, no) anaphase</li></ol><span class="tag acc"><b>Accept / ignore.</b> Accept a description of “cannot separate”, e.g. “cannot move to the poles”. Ignore “split”.</span><span class="tag rul"><b>Examiner rule.</b> Mark in pairs — 1 and 2, OR 3 and 4. A statement without its consequence scores nothing.</span><div class="ms-ref">AQA mark scheme &middot; 7401/1 Jun19 09.1</div></div></div></div></div><div class="prac-foot"><button type="button" class="prac-reveal">Show mark schemes</button><div class="prac-note">Questions are original, written in the style of real AQA past-paper questions. The mark schemes are AQA&rsquo;s own marking points, from the paper noted against each answer.</div></div></div>
+      </section>
+
+      <!-- ================= SECTION 4 ================= -->
+      <section class="spec-section" id="s4">
+        <div class="sec-eyebrow">Section 4 · spec content point</div>
+        <h2 class="sec-title"><span class="icon">✂️</span> Cytokinesis completes cell division</h2>
+        <p class="lede">Mitosis (Section 3) divides the nucleus; a separate step, cytokinesis, then physically splits the rest of the cell. It's a short spec point, but it's the actual moment "one cell" becomes "two cells."</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "Division of the cytoplasm (cytokinesis) usually occurs, producing two new cells."</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s4">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s4" data-level="1" style="display:none;">
+          <p>Splitting a cell in two is a bit like splitting a room in a house. If the house is flexible (an animal cell, with a bendy outer membrane), you can just pinch the middle of the room until it's two separate rooms. If the house has rigid brick walls already built (a plant cell, with a stiff cell wall), pinching won't work — instead you have to build a brand-new wall straight down the middle.</p>
+        </div>
+        <div class="level-block" data-group="s4" data-level="2" style="display:none;">
+          <p>Once mitosis has finished sorting the chromosomes into two identical sets, <strong>cytokinesis</strong> divides the cytoplasm itself, physically producing two separate daughter cells. Animal cells do this by the cell surface membrane pinching inwards around the middle (a cleavage furrow) until it seals off into two cells. Plant cells can't pinch, because they're surrounded by a rigid cell wall — instead, a new dividing wall (a <strong>cell plate</strong>) builds outward from the centre of the cell until it reaches the existing walls, splitting the cell in two.</p>
+        </div>
+        <div class="level-block" data-group="s4" data-level="3">
+        <p>Cytokinesis is a distinct step from mitosis itself — mitosis (Section 3) is specifically about the nucleus dividing and the chromosomes being sorted; cytokinesis is the cytoplasm then physically dividing to complete the process, "usually" producing two new cells.</p>
+        <table class="compare">
+          <tr><th>Cell type</th><th>Mechanism of cytokinesis</th></tr>
+          <tr><td>Animal cell</td><td>The cell surface membrane constricts inward around the equator (a <mark class="credit">cleavage furrow</mark>) until the cytoplasm is pinched into two separate cells.</td></tr>
+          <tr><td>Plant cell</td><td>A rigid cell wall prevents the membrane from simply constricting, so a new <mark class="credit">cell plate</mark> forms across the centre of the cell and grows outward until it fuses with the existing cell wall, dividing the cell in two.</td></tr>
+        </table>
+        <p>The spec's own wording says cytokinesis "<strong>usually</strong>" occurs — worth noticing, since it signals that mitosis (nuclear division) and cytokinesis (cytoplasmic division) aren't strictly the same event, and in some specialised or exceptional cases nuclear division can occur without an immediate, complete cytoplasmic split.</p>
+
+        <div class="callout tip">
+          <div class="ic">📌</div>
+          <div><p>If asked to compare mitosis in plant and animal cells, cytokinesis (not the chromosome behaviour, which is identical) is where the genuine structural difference lies — always name the cell plate for plants and the cleavage furrow/membrane constriction for animals.</p></div>
+        </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 5 ================= -->
+      <section class="spec-section" id="s5">
+        <div class="sec-eyebrow">Section 5 · spec content point</div>
+        <h2 class="sec-title"><span class="icon">🚧</span> Where mitosis ends and meiosis begins</h2>
+        <p class="lede">This spec point is really a boundary marker — a signal that everything on this page is about mitosis only, and that a genuinely different division process (meiosis) is examined separately. Knowing exactly where that line sits is worth more marks than it looks.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "Meiosis is covered in section 3.4.3."</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s5">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s5" data-level="1" style="display:none;">
+          <p>Think of mitosis as a photocopier making an exact duplicate of one page — you end up with two identical copies. A totally different process, meiosis, is more like cutting a deck of two different card sets in half and shuffling one half from each together — the four resulting hands are all different from each other and from the original decks. Mitosis and meiosis are simply not the same machine, and the vocabulary for one doesn't transfer to the other.</p>
+        </div>
+        <div class="level-block" data-group="s5" data-level="2" style="display:none;">
+          <p>Mitosis produces two daughter cells that are genetically identical to the parent cell and to each other — it's used for growth, repair, and asexual reproduction. Meiosis (a separate topic) instead produces four genetically different cells with half the chromosome number, and is used specifically to make gametes for sexual reproduction. The vocabulary doesn't cross over: in mitosis, <strong>sister chromatids</strong> separate; only in meiosis do <strong>homologous chromosomes</strong> separate (and only in its first division).</p>
+        </div>
+        <div class="level-block" data-group="s5" data-level="3">
+        <p>Mitosis produces two daughter cells that are diploid and genetically identical to the parent cell — appropriate for growth, tissue repair, and asexual reproduction. Meiosis, covered fully elsewhere on the specification, instead produces four haploid daughter cells that are genetically different from each other and from the parent cell — appropriate specifically for producing gametes ahead of sexual reproduction. The two processes are never interchangeable, and neither is their vocabulary.</p>
+        <table class="compare">
+          <tr><th>Point of comparison</th><th>Mitosis (this page)</th><th>Meiosis (3.4.3)</th></tr>
+          <tr><td>Number of daughter cells</td><td>Two</td><td>Four</td></tr>
+          <tr><td>Genetic identity of daughter cells</td><td>Identical to each other and the parent</td><td>Genetically different from each other and the parent</td></tr>
+          <tr><td>Chromosome number</td><td>Same as parent (diploid → diploid)</td><td>Halved (diploid → haploid)</td></tr>
+          <tr><td>What separates</td><td><strong>Sister chromatids</strong></td><td><strong>Homologous chromosomes</strong> (meiosis I), then sister chromatids (meiosis II)</td></tr>
+        </table>
+
+        <details class="toggle flag">
+          <summary><span class="caret">▶</span> 🚩 Trap — the single most common wrong phrase on this whole spec point</summary>
+          <div class="body">
+            <p>"Homologous chromosomes separate" is meiosis-only vocabulary. Writing it anywhere on a mitosis question — anaphase descriptions, non-disjunction questions, spindle-drug questions — is not credited, however confidently it's written. The correct term for mitosis, every time, is that <strong>sister (identical) chromatids</strong> separate.</p>
+          </div>
+        </details>
+        <details class="toggle">
+          <summary><span class="caret">▶</span> A subtler trap examiners have flagged: where mutations "arise"</summary>
+          <div class="body">
+            <p>A mutation present in <em>every</em> body cell of an organism did not "arise during meiosis" — it arose in the zygote (or in a gamete before fertilisation) and was then propagated to every cell of the body by repeated rounds of <strong>mitosis</strong>, not meiosis. This distinction — mitosis spreads a mutation through a body, meiosis is what creates new gametes — is a genuine source of lost marks precisely because both processes involve chromosomes and cell division.</p>
+          </div>
+        </details>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 6 ================= -->
+      <section class="spec-section" id="s6">
+        <div class="sec-eyebrow">Section 6 · spec content point</div>
+        <h2 class="sec-title"><span class="icon">🎗️</span> Mitosis, cancer &amp; treatment</h2>
+        <p class="lede">Mitosis has to stay tightly controlled — when it doesn't, the result is a tumour. This is also where the topic connects to evaluating real experimental data, which is examined very differently from the recall-based stages content.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "Mitosis is a controlled process. Uncontrolled cell division can lead to the formation of tumours and of cancers. Many cancer treatments are directed at controlling the rate of cell division."</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s6">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s6" data-level="1" style="display:none;">
+          <p>Imagine a factory that's supposed to make exactly the number of products it's told to, then stop. Cancer is like that factory's "stop" switch breaking — it just keeps producing more and more, faster than it should, piling up into an uncontrolled heap (a tumour). A cancer treatment is like a wrench thrown into the machine specifically to jam production — it slows down all fast-running machines, but the factories that were already running fast (cancer cells) get hit hardest.</p>
+        </div>
+        <div class="level-block" data-group="s6" data-level="2" style="display:none;">
+          <p>Normally, mitosis only happens when and where it's needed, under tight control. Cancer happens when that control breaks down and cells divide uncontrollably, building up into a mass of abnormal cells — a tumour. Because cancer cells divide much faster than most healthy cells, drugs that interfere with cell division affect the fast-dividing cancer cells far more than the slower-dividing healthy ones — that's the whole logic behind why these drugs work as treatments, and it's also why healthy dividing tissue (hair follicles, gut lining) still suffers side effects.</p>
+        </div>
+        <div class="level-block" data-group="s6" data-level="3">
+        <h3 class="sub-title">Why treatments target dividing cells</h3>
+        <p>Cancer cells divide more rapidly and uncontrollably than healthy cells — put the other way round, healthy cells divide comparatively slowly. A drug that interferes with the cell cycle therefore affects cancer cells disproportionately, while healthy, slower-dividing cells are relatively spared.</p>
+
+        <h3 class="sub-title">How a faster cell cycle produces a tumour</h3>
+        <p>A shortened interphase, or DNA replication starting earlier or proceeding faster, drives a faster overall cell cycle — resulting in a mass of abnormal, excessive cells: a tumour.</p>
+        <details class="toggle flag">
+          <summary><span class="caret">▶</span> 🚩 Trap — "uncontrolled growth" isn't precise enough</summary>
+          <div class="body">
+            <p>The mark scheme specifically wants the phrase "uncontrolled <strong>cell division</strong>," not the vaguer "uncontrolled growth." Growth and cell division aren't the same idea to an examiner — always name division specifically.</p>
+          </div>
+        </details>
+
+        <h3 class="sub-title">Evaluating a cancer drug from data</h3>
+        <p>A balanced answer is required — weigh both sides explicitly, don't just list positives.</p>
+        <table class="compare">
+          <tr><th>For the drug</th><th>Against / limitations</th></tr>
+          <tr><td>Little further increase in effect above a threshold concentration; most cells stop dividing; a greater effect on rapidly dividing (cancer) cells than on slower-dividing healthy cells; may promote programmed cell death.</td><td>Some cancer cells are still dividing even at the concentrations tested, so the cancer may continue to grow or spread; the best concentration may lie between those actually tested, so more trials are needed; healthy (also dividing) cells are damaged too, causing side effects; higher concentrations may be more harmful or more expensive.</td></tr>
+        </table>
+        <details class="toggle flag">
+          <summary><span class="caret">▶</span> 🚩 Trap — say "in culture," not "not tested on humans"</summary>
+          <div class="body">
+            <p>When a described study was carried out on cells grown in culture, the precise criticism the mark scheme wants is that the drug was tested "<strong>in culture</strong>" — not in a whole organism — so its effect on a real patient is still unknown. Writing "not tested on humans" or "tested on animals" instead of naming "in culture" specifically will not be credited, even though it's pointing at a similar idea.</p>
+          </div>
+        </details>
+
+        <div class="callout note">
+          <div class="ic">🔗</div>
+          <div><p>The hardest application skill on this whole spec point is applying "mitosis is controlled" consistently across three different contexts: a spindle-poison's mechanism (Section 3), evaluating a cancer drug from data (this section), and comparing mitosis with binary fission's own, plasmid-based control system (Section 7). Whenever a question links mitosis to cancer, write the full chain explicitly: named stage/mechanism affected → effect on cell division → effect on tumour growth/spread. Never leave the middle link ("cell division") implied.</p></div>
+        </div>
+        </div>
+      
+        <div class="practice"><div class="prac-head"><span class="prac-title">&#9997;&#65039; Exam-style practice</span><span class="prac-count"><b data-prac-count>4</b> questions &middot; <b data-prac-marks>12</b> marks</span><div class="lvl-switch" role="group" aria-label="Which paper"><button type="button" data-lvl="all" class="on">Both</button><button type="button" data-lvl="AS">AS</button><button type="button" data-lvl="A2">A2</button></div></div><div class="prac-empty">No questions at this level for this section &mdash; switch to <b>Both</b> to see them all.</div><div class="prac-body"><div class="prac-group" data-level="A2"><div class="prac-stem">A student investigated the effect of a potassium iodide (KI) solution on cancer cells grown in culture. She found that at a concentration of 100 units, 93% of the cancer cells were no longer dividing.</div><div class="prac-q" data-marks="4"><div class="q-head"><span class="q-no">2.1</span><span class="q-marks">4 marks</span><span class="q-lvl a2">A2</span></div><div class="q-text">Evaluate the suggestion that 100 units is the best concentration to use as a treatment for this cancer.</div><div class="q-space"></div><div class="ms" hidden><ol><li>(No, because) at 100 there are still some (7%) cancer cells dividing / undergoing mitosis</li><li>So the cancer is not destroyed / may continue to grow / spread / form tumours</li><li>The best concentration may be between 100 and 1000 / trials are needed between 100 and 1000</li><li>This research is in culture — we don’t know the effect of KI on people</li><li>(Yes, because) above 100 produces little increase in the % of cells not dividing OR at 100, most (93%) cancer cells are unable to divide / dead</li><li>Above 100 may be harmful (to the body)</li><li>Higher concentrations are more expensive</li></ol><span class="tag rul"><b>Examiner rule.</b> 4 max. A good answer gives points both for and against the suggestion and uses the figures from the data.</span><div class="ms-ref">AQA mark scheme &middot; 7401/1 Jun16 08.3</div></div></div><div class="prac-q" data-marks="2"><div class="q-head"><span class="q-no">2.2</span><span class="q-marks">2 marks</span><span class="q-lvl a2">A2</span></div><div class="q-text">Explain why a drug that stops mitosis also damages healthy tissue.</div><div class="q-space"></div><div class="ms" hidden><ol><li>Healthy cells (are) damaged / affected because they also divide</li><li>Cancer cells divide more / uncontrollably / rapidly OR healthy cells divide less / slowly — so the drug affects cancer cells more, but not only them</li></ol><div class="ms-ref">AQA mark scheme &middot; 7401/1 Jun19 09.2 · 7401/1 Jun19 09.4</div></div></div></div><div class="prac-group" data-level="A2"><div class="prac-stem">A drug called ABZ increases the concentration of Cyclin B in cells and lowers the ratio of the proteins Bcl-2 to Bax.</div><div class="prac-q" data-marks="4"><div class="q-head"><span class="q-no">3.1</span><span class="q-marks">4 marks</span><span class="q-lvl a2">A2</span></div><div class="q-text">Use this information to explain two ways in which ABZ could prevent tumour growth.</div><div class="q-space"></div><div class="ms" hidden><ol><li>(ABZ) increases / maintains Cyclin B</li><li>(So) mitosis (starts but) does not end (no tumour growth)</li><li>(ABZ) lowers the ratio of Bcl-2 to Bax</li><li>(So) apoptosis occurs / cells die (no tumour growth)</li></ol><span class="tag acc"><b>Accept / ignore.</b> Accept “(ABZ) decreases Bcl-2 and increases Bax”. Ignore references to spindle fibres. Ignore “mitosis will continue” and “mitosis stops” without qualification.</span><div class="ms-ref">AQA mark scheme &middot; 7401/1 Jun19 09.3</div></div></div><div class="prac-q" data-marks="2"><div class="q-head"><span class="q-no">3.2</span><span class="q-marks">2 marks</span><span class="q-lvl a2">A2</span></div><div class="q-text">Explain why a mutation that prevents a tumour suppressor gene from working can lead to a tumour.</div><div class="q-space"></div><div class="ms" hidden><ol><li>Affects / inactivates the tumour suppressor gene</li><li>Rate of cell division increased / tumour cells continue to divide</li></ol><span class="tag rul"><b>Examiner rule.</b> 2 max. Ignore answers relating to oncogenes in this mark scheme.</span><div class="ms-ref">AQA mark scheme &middot; BIOL5 Jun10 6(c)(ii)</div></div></div></div></div><div class="prac-foot"><button type="button" class="prac-reveal">Show mark schemes</button><div class="prac-note">Questions are original, written in the style of real AQA past-paper questions. The mark schemes are AQA&rsquo;s own marking points, from the paper noted against each answer.</div></div></div>
+      </section>
+
+      <!-- ================= SECTION 7 ================= -->
+      <section class="spec-section" id="s7">
+        <div class="sec-eyebrow">Section 7 · spec content point</div>
+        <h2 class="sec-title"><span class="icon">🦠</span> Binary fission in prokaryotic cells</h2>
+        <p class="lede">No nucleus, no spindle, no mitosis vocabulary at all — prokaryotic cells divide by a much simpler three-step process built around a single circular DNA molecule and its plasmids.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "Binary fission in prokaryotic cells involves: replication of the circular DNA and of plasmids; division of the cytoplasm to produce two daughter cells, each with a single copy of the circular DNA and a variable number of copies of plasmids."</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s7">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s7" data-level="1" style="display:none;">
+          <p>A bacterium splitting in two is much simpler than a human cell dividing — there's no complicated packing process. It's more like photocopying a single circular instruction sheet (plus a few spare copies of a smaller note), then just splitting the room in half so each half gets one full sheet and some of the spare notes.</p>
+        </div>
+        <div class="level-block" data-group="s7" data-level="2" style="display:none;">
+          <p>Prokaryotic cells don't have a nucleus or spindle fibres, so they can't divide by mitosis. Instead they use <strong>binary fission</strong>: the single loop of circular DNA (the bacterial chromosome) is copied, along with any small circular loops of extra DNA called <strong>plasmids</strong>. The cytoplasm then divides, producing two daughter cells — each gets one copy of the circular DNA, but the number of plasmid copies each daughter ends up with can vary.</p>
+        </div>
+        <div class="level-block" data-group="s7" data-level="3">
+        <ol class="steps">
+          <li><strong>Replication</strong> of the (single) circular DNA molecule and of any plasmids.</li>
+          <li><strong>Division of the cytoplasm</strong>, as a new septum/cell wall grows inward across the cell.</li>
+          <li><strong>Outcome</strong>: two daughter cells, each with one copy of the circular DNA and a variable number of plasmid copies.</li>
+        </ol>
+
+        <div class="diagram-card">
+          <svg viewBox="0 0 640 190" width="100%" role="img" aria-label="Diagram of binary fission in three steps">
+            <text x="320" y="16" text-anchor="middle" font-size="12" fill="var(--text-faint)">Binary fission — no spindle, no nucleus, just three steps</text>
+
+            <rect x="20" y="60" width="120" height="70" rx="30" fill="var(--blue-bg)" stroke="var(--blue-line)" stroke-width="1.5"/>
+            <circle cx="80" cy="95" r="18" fill="none" stroke="var(--text-dim)" stroke-width="1.8"/>
+            <circle cx="100" cy="80" r="6" fill="var(--amber-bg)" stroke="var(--amber-line)"/>
+            <text x="80" y="150" text-anchor="middle" font-size="9.5" fill="var(--text-dim)">1 circular DNA + plasmid</text>
+            <text x="80" y="50" text-anchor="middle" font-size="10" font-weight="700" fill="var(--text-dim)">PARENT CELL</text>
+
+            <text x="175" y="98" font-size="16" fill="var(--text-faint)">→</text>
+
+            <rect x="200" y="60" width="130" height="70" rx="30" fill="var(--amber-bg)" stroke="var(--amber-line)" stroke-width="1.5"/>
+            <circle cx="245" cy="90" r="15" fill="none" stroke="var(--text-dim)" stroke-width="1.6"/>
+            <circle cx="285" cy="98" r="15" fill="none" stroke="var(--text-dim)" stroke-width="1.6"/>
+            <circle cx="260" cy="72" r="5" fill="var(--bg)" stroke="var(--amber-line)"/>
+            <circle cx="300" cy="80" r="5" fill="var(--bg)" stroke="var(--amber-line)"/>
+            <text x="265" y="150" text-anchor="middle" font-size="9.5" fill="var(--text-dim)">DNA + plasmids copied</text>
+            <text x="265" y="50" text-anchor="middle" font-size="10" font-weight="700" fill="var(--text-dim)">DNA REPLICATES</text>
+
+            <text x="345" y="98" font-size="16" fill="var(--text-faint)">→</text>
+
+            <rect x="370" y="60" width="130" height="70" rx="30" fill="var(--green-bg)" stroke="var(--green-line)" stroke-width="1.5"/>
+            <line x1="435" y1="55" x2="435" y2="135" stroke="var(--green-line)" stroke-width="2.5" stroke-dasharray="4 3"/>
+            <circle cx="405" cy="90" r="13" fill="none" stroke="var(--text-dim)" stroke-width="1.5"/>
+            <circle cx="465" cy="98" r="13" fill="none" stroke="var(--text-dim)" stroke-width="1.5"/>
+            <circle cx="418" cy="75" r="4.5" fill="var(--bg)" stroke="var(--green-line)"/>
+            <circle cx="475" cy="80" r="4.5" fill="var(--bg)" stroke="var(--green-line)"/>
+            <text x="435" y="150" text-anchor="middle" font-size="9.5" fill="var(--text-dim)">new septum grows inward</text>
+            <text x="435" y="50" text-anchor="middle" font-size="10" font-weight="700" fill="var(--text-dim)">CYTOPLASM DIVIDES</text>
+
+            <text x="515" y="98" font-size="16" fill="var(--text-faint)">→</text>
+
+            <rect x="540" y="65" width="45" height="55" rx="18" fill="var(--purple-bg)" stroke="var(--purple-line)" stroke-width="1.5"/>
+            <rect x="590" y="70" width="45" height="50" rx="18" fill="var(--purple-bg)" stroke="var(--purple-line)" stroke-width="1.5"/>
+            <circle cx="562" cy="92" r="10" fill="none" stroke="var(--text-dim)" stroke-width="1.3"/>
+            <circle cx="612" cy="95" r="9" fill="none" stroke="var(--text-dim)" stroke-width="1.3"/>
+            <circle cx="572" cy="80" r="3.5" fill="var(--bg)" stroke="var(--purple-line)"/>
+            <circle cx="620" cy="82" r="3.5" fill="var(--bg)" stroke="var(--purple-line)"/>
+            <circle cx="605" cy="105" r="3.5" fill="var(--bg)" stroke="var(--purple-line)"/>
+            <text x="587" y="155" text-anchor="middle" font-size="9" fill="var(--text-dim)">2 daughter cells: 1 DNA copy + variable plasmids each</text>
+          </svg>
+          <div class="diagram-cap">No spindle, no nucleus — the circular DNA and plasmids simply replicate, the cytoplasm divides, and two daughter cells result. Note the two finished daughters here have different plasmid counts (2 and 1): the spec's own wording is "a variable number of copies of plasmids," unlike the fixed chromosome count in mitosis.</div>
+        </div>
+
+        <h3 class="sub-title">Comparing mitosis with binary fission</h3>
+        <table class="compare">
+          <tr><th>Feature</th><th>Mitosis</th><th>Binary fission</th></tr>
+          <tr><td>Cell type</td><td>Eukaryotic</td><td>Prokaryotic</td></tr>
+          <tr><td>DNA replicated</td><td>Linear DNA (chromosomes)</td><td>Circular DNA (+ plasmids)</td></tr>
+          <tr><td>Spindle fibres involved</td><td>Yes</td><td>No</td></tr>
+          <tr><td>Number of daughter cells produced</td><td>Two</td><td>Two</td></tr>
+        </table>
+        <details class="toggle flag">
+          <summary><span class="caret">▶</span> 🚩 Trap — neither process produces four daughter cells</summary>
+          <div class="body">
+            <p>Both mitosis and binary fission always produce exactly <strong>two</strong> daughter cells. Four daughter cells is a meiosis-only outcome (Section 5) — don't let it drift into a binary-fission answer either.</p>
+          </div>
+        </details>
+        </div>
+      
+        <div class="practice"><div class="prac-head"><span class="prac-title">&#9997;&#65039; Exam-style practice</span><span class="prac-count"><b data-prac-count>2</b> questions &middot; <b data-prac-marks>4</b> marks</span><div class="lvl-switch" role="group" aria-label="Which paper"><button type="button" data-lvl="all" class="on">Both</button><button type="button" data-lvl="AS">AS</button><button type="button" data-lvl="A2">A2</button></div></div><div class="prac-empty">No questions at this level for this section &mdash; switch to <b>Both</b> to see them all.</div><div class="prac-body"><div class="prac-group" data-level="A2"><div class="prac-stem">Bacteria divide by binary fission.</div><div class="prac-q" data-marks="2"><div class="q-head"><span class="q-no">1.1</span><span class="q-marks">2 marks</span><span class="q-lvl a2">A2</span></div><div class="q-text">Describe binary fission.</div><div class="q-space"></div><div class="ms" hidden><ol><li>Binary fission</li><li>Replication of the (circular) DNA</li><li>Division of the cytoplasm to produce 2 daughter cells</li><li>Each with a single copy of the (circular) DNA</li></ol><span class="tag acc"><b>Accept / ignore.</b> Ignore reference to “chromosome”. Ignore “copy”. Ignore references to the number of plasmids.</span><span class="tag rej"><b>Reject.</b> Binary fusion.</span><span class="tag rul"><b>Examiner rule.</b> 2 max.</span><div class="ms-ref">AQA mark scheme &middot; 7402/1 Jun17 4.1 · 7401/1 Jun18 04.3</div></div></div><div class="prac-q" data-marks="2"><div class="q-head"><span class="q-no">1.2</span><span class="q-marks">2 marks</span><span class="q-lvl a2">A2</span></div><div class="q-text">A culture began with 1.35 × 10⁴ bacteria and divided six times. Calculate the number of bacteria present.</div><div class="q-space"></div><div class="ms" hidden><ol><li>8.64 × 10⁵ — 2 marks</li><li>For 1 mark: 2⁶ = 64, OR 64 / 2⁶ × (1.35 × 10⁴)</li></ol><span class="tag acc"><b>Accept / ignore.</b> Accept 864 000 however expressed, e.g. 864 × 10³.</span><div class="ms-ref">AQA mark scheme &middot; 7401/1 Jun18 04.4</div></div></div></div></div><div class="prac-foot"><button type="button" class="prac-reveal">Show mark schemes</button><div class="prac-note">Questions are original, written in the style of real AQA past-paper questions. The mark schemes are AQA&rsquo;s own marking points, from the paper noted against each answer.</div></div></div>
+      </section>
+
+      <!-- ================= SECTION 8 ================= -->
+      <section class="spec-section" id="s8">
+        <div class="sec-eyebrow">Section 8 · spec content point</div>
+        <h2 class="sec-title"><span class="icon">🧪</span> Viruses and why they don't divide</h2>
+        <p class="lede">Viruses sit entirely outside the "cells arise from other cells" rule — the reason is built into the spec's own wording, and it's a clean, testable distinction.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "Being non-living, viruses do not undergo cell division. Following injection of their nucleic acid, the infected host cell replicates the virus particles."</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s8">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s8" data-level="1" style="display:none;">
+          <p>A virus is a bit like a USB stick with a set of building instructions on it, but no factory of its own to build anything with. On its own it can't do anything. It has to plug into someone else's factory (a living cell) and use that factory's machines and workers to run off thousands of copies of itself.</p>
+        </div>
+        <div class="level-block" data-group="s8" data-level="2" style="display:none;">
+          <p>Viruses are non-living — they have no cell structure, no cytoplasm, no way to carry out life processes on their own — so they cannot divide by mitosis or binary fission, since both of those need a living cell to work. Instead, a virus injects its nucleic acid into a host cell, and it's the host cell's own ribosomes, enzymes and building blocks that get hijacked to build brand-new virus particles.</p>
+        </div>
+        <div class="level-block" data-group="s8" data-level="3">
+        <p>Viruses are non-living, or <strong>acellular</strong> — they have no cell structure and cannot independently carry out the processes of life, so they cannot divide by either mitosis or binary fission. Instead, a virus attaches to a specific receptor on a host cell's surface and injects its nucleic acid into that cell. The infected host cell is then hijacked: its own ribosomes, enzymes and nucleotides are used to replicate the viral nucleic acid and synthesise viral proteins, which then assemble into new virus particles and are released.</p>
+
+        <div class="callout tip">
+          <div class="ic">📌</div>
+          <div><p>The exact phrase worth reusing here is "the infected host cell replicates the virus particles" — the virus itself never divides; the host cell's own machinery does the work.</p></div>
+        </div>
+
+        <details class="toggle flag">
+          <summary><span class="caret">▶</span> 🚩 Trap — don't blur viral replication with binary fission or mitosis</summary>
+          <div class="body">
+            <p>Cytokinesis/telophase language ("the membrane pinching") sometimes gets muddled with viral replication or with binary fission in exam answers. Keep the three processes entirely separate: mitosis (eukaryotic, spindle-based), binary fission (prokaryotic, no spindle, self-replicating), and viral replication (no division at all — a hijacked host cell manufactures new particles).</p>
+          </div>
+        </details>
+        </div>
+      
+        <div class="practice"><div class="prac-head"><span class="prac-title">&#9997;&#65039; Exam-style practice</span><span class="prac-count"><b data-prac-count>1</b> question &middot; <b data-prac-marks>2</b> marks</span><div class="lvl-switch" role="group" aria-label="Which paper"><button type="button" data-lvl="all" class="on">Both</button><button type="button" data-lvl="AS">AS</button><button type="button" data-lvl="A2">A2</button></div></div><div class="prac-empty">No questions at this level for this section &mdash; switch to <b>Both</b> to see them all.</div><div class="prac-body"><div class="prac-group" data-level="A2"><div class="prac-stem">Bacteria divide by binary fission.</div><div class="prac-q" data-marks="2"><div class="q-head"><span class="q-no">1.3</span><span class="q-marks">2 marks</span><span class="q-lvl a2">A2</span></div><div class="q-text">Explain why a virus is not said to divide by binary fission or by mitosis.</div><div class="q-space"></div><div class="ms" hidden><ol><li>A virus is acellular / not a cell, so it does not undergo cell division</li><li>Following injection of its nucleic acid it uses the host cell to replicate</li></ol><div class="ms-ref">AQA mark scheme &middot; spec statement · 7401/1 Nov21 02.2</div></div></div></div></div><div class="prac-foot"><button type="button" class="prac-reveal">Show mark schemes</button><div class="prac-note">Questions are original, written in the style of real AQA past-paper questions. The mark schemes are AQA&rsquo;s own marking points, from the paper noted against each answer.</div></div></div>
+      </section>
+
+      <!-- ================= SECTION 9 ================= -->
+      <section class="spec-section" id="s9">
+        <div class="sec-eyebrow">Section 9 · spec content point · Required Practical 2</div>
+        <h2 class="sec-title"><span class="icon">🔬</span> RP2 — the root-tip squash &amp; mitotic index</h2>
+        <p class="lede">This practical is tied directly to this spec point: prepare a stained squash of root-tip cells, use it to identify the stages of mitosis, and turn what you see into a number — the mitotic index.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "Required practical 2: Preparation of stained squashes of cells from plant root tips; set-up and use of an optical microscope to identify the stages of mitosis in these stained squashes and calculation of a mitotic index."</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s9">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s9" data-level="1" style="display:none;">
+          <p>Imagine squashing a tiny bit of root tip flat between two pieces of glass so you can see every cell individually under a microscope, after dyeing all the chromosomes a dark colour so they stand out. Then you just count: out of everyone you can see, how many are "mid-split" (dividing) right now? That fraction tells you how busy that patch of the plant is at making new cells.</p>
+        </div>
+        <div class="level-block" data-group="s9" data-level="2" style="display:none;">
+          <p>A small piece of actively-growing root tip (the meristem) is softened in warm dilute acid to separate the cells, stained so the chromosomes show up clearly, then squashed flat under a coverslip into a single layer so nothing overlaps. Under the microscope, each cell is scored as either "in mitosis" (visible condensed chromosomes) or "in interphase" (no visible chromosomes). The <strong>mitotic index</strong> is simply the fraction of cells actively dividing.</p>
+        </div>
+        <div class="level-block" data-group="s9" data-level="3">
+        <h3 class="sub-title">Method: producing a stained root-tip squash</h3>
+        <ol class="steps">
+          <li>Cut a small piece (1–2 mm) of root containing the <strong>meristem</strong> — the actively dividing tissue at the root tip — from a growing root (e.g. garlic or onion).</li>
+          <li><strong>Soften</strong> the tissue in warm dilute hydrochloric acid — this partially digests the middle lamella / breaks down the cell walls, separating the cells so individual ones can be distinguished.</li>
+          <li><strong>Stain</strong> with a DNA-specific stain (e.g. toluidine blue or acetic orcein) so condensed chromosomes are clearly visible.</li>
+          <li><strong>Squash</strong> the stained tip firmly under a coverslip to spread the tissue into a single cell layer — overlapping layers can't be scored reliably, and light needs to pass through for viewing.</li>
+          <li><strong>Examine</strong> under an optical microscope, low power first then high power, working systematically across multiple fields of view, identifying which stage of mitosis (or interphase) each cell is in from chromosome appearance.</li>
+        </ol>
+
+        <h3 class="sub-title">Calculating the mitotic index</h3>
+        <div class="callout note">
+          <div class="ic">🧮</div>
+          <div><p><strong>Mitotic index</strong> = number of cells with visible chromosomes (i.e. cells actively dividing) ÷ total number of cells counted — expressed as a decimal, percentage, or ratio, depending what the question asks for.</p></div>
+        </div>
+        <details class="toggle flag">
+          <summary><span class="caret">▶</span> 🚩 Trap — decimal places and showing your working</summary>
+          <div class="body">
+            <p>The correct value given to the wrong number of decimal places only scores partial credit — precision matters. Always show full intermediate working (cells dividing, total cells, then the division) so that even a numerically-wrong final answer can still pick up method marks. Check exactly what format the question wants: a decimal, a percentage, or a ratio.</p>
+          </div>
+        </details>
+
+        <h3 class="sub-title">Improving the reliability of the count</h3>
+        <p>These are marked strictly in cause-and-reason pairs — a suggestion without its reason scores nothing.</p>
+        <ul class="tidy">
+          <li>Examine many different fields of view across the slide → so the sample is representative of the whole root tip, not one region.</li>
+          <li>Repeat the count and calculate a mean → so anomalous, one-off counts are smoothed out.</li>
+          <li>Standardise how part-cells at a field's edge are treated → so the same counting rule is applied consistently, not biased by where the boundary happens to fall.</li>
+        </ul>
+
+        <h3 class="sub-title">Interpreting a higher mitotic index</h3>
+        <p>A higher mitotic index means a greater proportion of cells are actively dividing in that sample. It's used to compare different regions of a root (the meristem has by far the highest index), and — connecting back to Section 6 — the same technique applied to a biopsy sample can flag rapidly dividing tumour tissue.</p>
+        </div>
+      
+        <div class="practice"><div class="prac-head"><span class="prac-title">&#9997;&#65039; Exam-style practice</span><span class="prac-count"><b data-prac-count>2</b> questions &middot; <b data-prac-marks>4</b> marks</span><div class="lvl-switch" role="group" aria-label="Which paper"><button type="button" data-lvl="all" class="on">Both</button><button type="button" data-lvl="AS">AS</button><button type="button" data-lvl="A2">A2</button></div></div><div class="prac-empty">No questions at this level for this section &mdash; switch to <b>Both</b> to see them all.</div><div class="prac-body"><div class="prac-group" data-level="AS"><div class="prac-stem">A student prepared a stained squash of cells from a garlic root tip and counted the cells in each stage.</div><div class="prac-q" data-marks="2"><div class="q-head"><span class="q-no">3.1</span><span class="q-marks">2 marks</span><span class="q-lvl as">AS</span></div><div class="q-text">She counted 15 cells in mitosis out of 700 cells in the field of view. Calculate the mitotic index as a percentage, to three decimal places.</div><div class="q-space"></div><div class="ms" hidden><ol><li>Correct answer of 1.286 — 2 marks</li><li>For 1 mark: 1.28571429 (correct answer not to 3 decimal places), OR 1.285 (incorrect rounding), OR evidence of 0.02142857, OR evidence of 15 and 700</li></ol><div class="ms-ref">AQA mark scheme &middot; 7402/1 Nov21 06.1</div></div></div><div class="prac-q" data-marks="2"><div class="q-head"><span class="q-no">3.2</span><span class="q-marks">2 marks</span><span class="q-lvl as">AS</span></div><div class="q-text">Describe two things she should do to make her result more reliable, and explain each.</div><div class="q-space"></div><div class="ms" hidden><ol><li>Examine a large number of fields of view / many cells; to ensure a representative sample</li><li>OR repeat the count; to ensure the figures are correct</li><li>OR a method to deal with part cells at the edge / count only whole cells; to standardise counting</li></ol><span class="tag acc"><b>Accept / ignore.</b> Accept “large number” or “20 or more” for many. Accept “typical” or “reliable” for representative.</span><span class="tag rul"><b>Examiner rule.</b> Mark as pairs only. A description without its explanation scores nothing — 2 max.</span><div class="ms-ref">AQA mark scheme &middot; 7401/2 Jun18 05.4</div></div></div></div></div><div class="prac-foot"><button type="button" class="prac-reveal">Show mark schemes</button><div class="prac-note">Questions are original, written in the style of real AQA past-paper questions. The mark schemes are AQA&rsquo;s own marking points, from the paper noted against each answer.</div></div></div>
+      </section>
+
+      <!-- ================= SECTION 10 ================= -->
+      <section class="spec-section" id="s10">
+        <div class="sec-eyebrow">Section 10 · spec content point · Required Practical 2</div>
+        <h2 class="sec-title"><span class="icon">📏</span> Calculating actual cell size from a microscope image</h2>
+        <p class="lede">The same root-tip slide also produces a measurement question: given how big a cell looks under the microscope, and at what magnification, work out how big it actually is.</p>
+
+        <div class="callout spec">
+          <div class="ic">📖</div>
+          <div><p><strong>What the specification says:</strong> "Students should measure the apparent size of cells in the root tip and calculate their actual size using the formula: actual size = size of image ÷ magnification."</p></div>
+        </div>
+
+        <div class="level-switcher" data-group="s10">
+          <span class="level-label"></span>
+          <button class="btn primary level-btn">Explain more simply ↓</button>
+          <div class="level-dots">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot active" data-level="3">3</div>
+          </div>
+        </div>
+
+        <div class="level-block" data-group="s10" data-level="1" style="display:none;">
+          <p>If a photo of an ant has been zoomed in 10 times and the ant looks 50 mm long in the photo, the real ant is only 5 mm long — you just undo the zoom by dividing. Cell-size questions work exactly the same way: measure how big the cell looks, find out how much it's been magnified by, then divide to get the real size.</p>
+        </div>
+        <div class="level-block" data-group="s10" data-level="2" style="display:none;">
+          <p>What you measure on a microscope image or drawing is the <strong>apparent (image) size</strong> — not the cell's real size, because the microscope has magnified it. To find the <strong>actual size</strong>, divide the image size by the magnification. The tricky part is almost always units: the image size and the answer often need converting into different units (commonly µm for a cell-sized structure) before or after the division.</p>
+        </div>
+        <div class="level-block" data-group="s10" data-level="3">
+        <div class="callout note">
+          <div class="ic">🧮</div>
+          <div><p><strong>Actual size = size of image ÷ magnification.</strong> Always keep the units of image size and magnification consistent before dividing, and convert the final answer into a sensible unit (typically µm) for a cell-sized structure.</p></div>
+        </div>
+        <details class="toggle">
+          <summary><span class="caret">▶</span> Worked example</summary>
+          <div class="body">
+            <p>A cell measured on a micrograph is 45 mm long. The micrograph is captioned ×3000 magnification. Find the actual length of the cell in µm.</p>
+            <p>Actual size = image size ÷ magnification = 45 mm ÷ 3000 = 0.015 mm. Converting to µm (×1000): <strong>15 µm</strong>.</p>
+          </div>
+        </details>
+        <details class="toggle flag">
+          <summary><span class="caret">▶</span> 🚩 Trap — mixing units before dividing</summary>
+          <div class="body">
+            <p>The single most common error here is dividing before converting units, or forgetting to convert the final answer into a sensible unit for a cell (µm, not mm or m). Convert first, divide second, and always sanity-check that a final cell size in the tens-of-µm range is biologically plausible — an answer in mm or in thousands of µm for a single plant cell is almost certainly a units error.</p>
+          </div>
+        </details>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 11 ================= -->
+      <section class="spec-section" id="s11">
+        <div class="sec-eyebrow">Section 11 · exam technique</div>
+        <h2 class="sec-title"><span class="icon">🎯</span> Common mistakes &amp; precise wording</h2>
+        <p class="lede">The biology of mitosis is genuinely learnable — most of the difficulty on this spec point comes from wording precision rather than conceptual difficulty. These are the slips that come up again and again.</p>
+
+        <table class="compare">
+          <tr><th>Vague or wrong version</th><th>What to say instead</th></tr>
+          <tr><td>"Homologous chromosomes separate" (for anaphase or non-disjunction)</td><td>Sister (identical) chromatids separate — homologous pairs only separate in meiosis I</td></tr>
+          <tr><td>"Chromosomes replicate"</td><td>The DNA replicates — precise enough for the doubled-DNA-content mark</td></tr>
+          <tr><td>Naming prophase/metaphase/anaphase for a falling DNA-content graph</td><td>DNA content only falls once the cell physically divides — telophase/cytokinesis</td></tr>
+          <tr><td>"Uncontrolled growth" (cancer questions)</td><td>Uncontrolled cell division — the specific phrase the mark scheme wants</td></tr>
+          <tr><td>"Not tested on humans" / "tested on animals" (cancer-drug evaluation)</td><td>Tested "in culture" — the precise criticism credited</td></tr>
+          <tr><td>Non-disjunction leaves a cell with zero chromosomes</td><td>One daughter cell gets too many, the other too few — never zero</td></tr>
+          <tr><td>Interphase described as "a stage of mitosis"</td><td>Interphase is a stage of the wider cell cycle, occurring before mitosis begins</td></tr>
+          <tr><td>Binary fission or mitosis producing four daughter cells</td><td>Both always produce exactly two — four is meiosis-only</td></tr>
+        </table>
+
+        <details class="toggle">
+          <summary><span class="caret">▶</span> Where the real difficulty sits at AS vs A2</summary>
+          <div class="body">
+            <p>The five stages and their basic descriptions are straightforward recall, and most AS-level questions (naming a stage from an image, basic spindle-disruption effects, reliability-of-counting reasoning for RP2) are short items with a clear, learnable mark scheme. The difficulty rises noticeably later: the full "describe the stages" answer is capped by a single misidentified stage name; the spindle-poison mechanism must distinguish "no metaphase" from "no anaphase" as two separately mark-paired outcomes; cancer-drug evaluation demands genuine two-sided balance with the "against" side deliberately capped; and the mitotic-index calculation requires a specific number of decimal places with full working shown. Several independent, easy-to-drop marks stack up on what looks, at a glance, like a short topic.</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- ================= SECTION 12 ================= -->
+      <section class="spec-section" id="s12">
+        <div class="sec-eyebrow">Section 12 · exam technique</div>
+        <h2 class="sec-title"><span class="icon">✍️</span> Using this in longer written answers</h2>
+        <p class="lede">This content works well as a supporting paragraph in a longer essay-style answer wherever the title concerns control, cycles, or the importance of a process to organisms — the trick is always closing with a sentence that ties the mechanism back to the actual title, not a generic summary.</p>
+
+        <details class="toggle">
+          <summary><span class="caret">▶</span> Example paragraph — angled around "control"</summary>
+          <div class="body">
+            <p>Mitosis is a tightly controlled process: the cell cycle is checkpoint-regulated, ensuring division only proceeds once DNA has been correctly replicated and the cell is ready. When this control breaks down, cell division becomes uncontrolled, producing a mass of abnormal cells — a tumour — which may become cancerous. Many cancer treatments exploit this same control system, targeting rapidly dividing cells disproportionately because cancer cells divide faster than most healthy tissue. This shows how a single controlled cellular process, when disrupted, can have consequences at the level of the whole organism.</p>
+          </div>
+        </details>
+        <details class="toggle">
+          <summary><span class="caret">▶</span> Example paragraph — angled around "cell division as a shared, but not identical, control system"</summary>
+          <div class="body">
+            <p>Cell division is fundamental to growth, repair and reproduction across all life, but the mechanism differs between kingdoms of organism. Eukaryotic cells divide by mitosis, a spindle-based process producing two genetically identical daughter cells; prokaryotic cells instead use binary fission, replicating a single circular DNA molecule and any plasmids before the cytoplasm divides, again producing two daughter cells but without any spindle apparatus at all. Both processes maintain a stable, replicated genetic content in every daughter cell, illustrating that "controlled cell division" is a universal requirement of life, even though its precise mechanism is not.</p>
+          </div>
+        </details>
+
+        <p class="lede" style="margin-top:6px;">Whichever essay theme this content supports, treat it as the "mechanism" paragraph: state the process precisely — naming spindle fibres, checkpoints, or circular DNA depending on what the title is asking about — then add one sentence linking it explicitly back to that theme.</p>
+      </section>
+
+      <!-- ================= SECTION 13 ================= -->
+      <section class="spec-section" id="s13">
+        <div class="sec-eyebrow">Section 13</div>
+        <h2 class="sec-title"><span class="icon">🧷</span> Where this fits in the course, memory hook &amp; checklist</h2>
+
+        <h3 class="sub-title">Where 3.2.2 reappears across the rest of the specification</h3>
+        <ul class="tidy">
+          <li><strong>3.2.3 Transport across cell membranes</strong> — the cell cycle and dividing cells provide context for much of the membrane-transport content that follows.</li>
+          <li><strong>3.4.3 Meiosis</strong> — directly contrasted with mitosis: homologous pairs separate in meiosis I, never in mitosis; this page's "sister chromatids, not homologous chromosomes" rule is the constant reference point.</li>
+          <li><strong>3.8.2.3 Gene expression and cancer</strong> — directly extends the cancer content here: oncogenes, tumour suppressor genes, and how mutations in genes controlling the cell cycle lead to uncontrolled cell division.</li>
+        </ul>
+        <p>Rule of thumb: any later question that needs to distinguish mitosis from meiosis, or explains a cancer mechanism at the gene level, is built on the vocabulary and stage sequence fixed on this page.</p>
+
+        <div class="callout note">
+          <div class="ic">🧠</div>
+          <div><p><strong>Memory hook — IPMAT, count your chromosomes.</strong> Interphase, Prophase, Metaphase, Anaphase, Telophase (+ cytokinesis). At every stage, count: 4 chromosomes enter mitosis (as diffuse chromatin) → 4 condensed chromosomes, each as a chromatid pair, through prophase and metaphase → 8 individual chromatids split apart in anaphase → 4 + 4 identical chromosomes end up in the two new cells. If a diagram doesn't keep that count consistent, it's wrong — the single most examiner-reported drawing error on this spec point. And whenever "homologous" tries to sneak into a mitosis answer, stop — that word belongs only to meiosis.</p></div>
+        </div>
+
+        <h3 class="sub-title">Self-check before moving on</h3>
+        <ul class="checklist" id="finalChecklist">
+          <li><input type="checkbox"><span>I know why some cells (e.g. meristem, stem cells) retain the ability to divide while most specialised cells don't.</span></li>
+          <li><input type="checkbox"><span>I can describe the cell cycle (interphase: G1, S, G2, then mitosis) and read a DNA-content-against-time graph correctly, including why only telophase/cytokinesis causes DNA content to fall.</span></li>
+          <li><input type="checkbox"><span>I can name and describe all five stages of mitosis (IPMAT), correctly attaching each event to its stage, and explain the role of spindle fibres attaching to centromeres.</span></li>
+          <li><input type="checkbox"><span>I can describe cytokinesis in animal cells (cleavage furrow) and plant cells (cell plate) as a distinct step from mitosis itself.</span></li>
+          <li><input type="checkbox"><span>I never write "homologous chromosomes separate" for mitosis, and I can explain clearly how mitosis differs from meiosis (covered in 3.4.3).</span></li>
+          <li><input type="checkbox"><span>I can explain why cancer treatments target dividing cells, and evaluate cancer-drug data in a genuinely balanced way, always flagging results "in culture."</span></li>
+          <li><input type="checkbox"><span>I can describe binary fission as a three-step sequence and compare it correctly with mitosis (circular vs linear DNA, no spindle, still two daughter cells).</span></li>
+          <li><input type="checkbox"><span>I can explain why viruses don't undergo cell division, and how a host cell replicates virus particles instead.</span></li>
+          <li><input type="checkbox"><span>I can describe the root-tip squash method, calculate a mitotic index with full working, and give paired reliability improvements for the count (RP2).</span></li>
+          <li><input type="checkbox"><span>I can calculate actual cell size from image size and magnification, keeping units consistent throughout.</span></li>
+        </ul>
+      </section>
+
+      <footer class="page-footer">A study tool built from your own revision material, reworded throughout into original notes. Everything on this page runs locally in your browser and nothing is saved when you close the tab.</footer>
+    </div>
+
+    <!-- ============ CRAM VIEW ============ -->
+    <div id="cramView" class="tool-panel" style="display:none;">
+      <div class="tool-header"><span style="font-size:26px;">⚡</span><div><h1 class="page-title" style="font-size:26px;margin-bottom:2px;">5-Minute Cram</h1></div></div>
+      <p class="tool-sub">Every spec content point, cut down to the facts that carry the most marks. Read this the night before, or right before you walk in.</p>
+
+      <div class="cram-point">
+        <h3>1 · Not every cell can divide</h3>
+        <ul>
+          <li>Differentiated cells (e.g. mature red blood cells, neurones) permanently lose the ability to divide.</li>
+          <li>Cells that <strong>do</strong> retain it: meristems (plants — root/shoot tip) and stem cells (animals — bone marrow, skin/gut basal layers).</li>
+          <li>This is why the meristem has the highest mitotic index in a root (Section 9).</li>
+        </ul>
+      </div>
+      <div class="cram-point">
+        <h3>2 · The cell cycle &amp; DNA replication</h3>
+        <ul>
+          <li>Interphase (G1, S, G2) is long; mitosis is short. DNA replicates in <strong>S phase only</strong>.</li>
+          <li>A DNA-content graph: flat-low = pre-S interphase; rising = S phase; flat-high = G2 through anaphase; <strong>sudden fall = telophase/cytokinesis only</strong> (never prophase/metaphase/anaphase alone).</li>
+          <li>Say "the DNA replicates," not "chromosomes replicate."</li>
+          <li>Cycle length = time between two successive starts (or ends) of DNA replication.</li>
+        </ul>
+      </div>
+      <div class="cram-point">
+        <h3>3 · The five stages of mitosis</h3>
+        <ul>
+          <li><strong>IPMAT</strong>: Interphase (not part of mitosis) → Prophase (condense, envelope breaks down) → Metaphase (line up at equator, spindle attaches to centromeres) → Anaphase (centromeres divide, chromatids pulled to poles) → Telophase (envelope reforms, decondense).</li>
+          <li>Chromosome count check: 4 → 4 (chromatid pairs) → 8 chromatids separating → 4+4 in daughters.</li>
+          <li>Spindle-disrupting drug: no attachment → no metaphase; no pulling → no anaphase. Never "homologous chromosomes separate."</li>
+          <li>Non-disjunction = uneven split (too many/too few) — never a cell with zero chromosomes.</li>
+        </ul>
+      </div>
+      <div class="cram-point">
+        <h3>4 · Cytokinesis</h3>
+        <ul>
+          <li>Animal cells: membrane constricts inward (cleavage furrow).</li>
+          <li>Plant cells: new cell plate grows across the centre (rigid cell wall prevents pinching).</li>
+          <li>Spec says "usually" occurs — a separate step from mitosis (nuclear division) itself.</li>
+        </ul>
+      </div>
+      <div class="cram-point">
+        <h3>5 · Mitosis vs meiosis boundary</h3>
+        <ul>
+          <li>Mitosis: 2 identical diploid daughter cells. Meiosis (3.4.3): 4 genetically different haploid cells.</li>
+          <li>Mitosis = sister chromatids separate. Meiosis I = homologous chromosomes separate. Never swap these.</li>
+          <li>A mutation in every body cell arose in the zygote/gamete and spread by mitosis — not "during meiosis."</li>
+        </ul>
+      </div>
+      <div class="cram-point">
+        <h3>6 · Mitosis, cancer &amp; treatment</h3>
+        <ul>
+          <li>Cancer cells divide faster/uncontrollably → drugs targeting division hit them harder than slow-dividing healthy cells.</li>
+          <li>Faster cycle (shorter interphase / earlier replication) → uncontrolled cell division → tumour. Say "cell division," not "growth."</li>
+          <li>Evaluate drug data both ways — and say "in culture," never "not tested on humans."</li>
+        </ul>
+      </div>
+      <div class="cram-point">
+        <h3>7 · Binary fission</h3>
+        <ul>
+          <li>3 steps: circular DNA + plasmids replicate → cytoplasm divides → 2 daughter cells, each 1 DNA copy + variable plasmids.</li>
+          <li>No spindle, no nucleus, prokaryotic only. Still exactly 2 daughter cells (never 4).</li>
+        </ul>
+      </div>
+      <div class="cram-point">
+        <h3>8 · Viruses &amp; cell division</h3>
+        <ul>
+          <li>Viruses are non-living/acellular — cannot divide by mitosis or binary fission.</li>
+          <li>Nucleic acid injected → host cell's own machinery replicates the virus particles.</li>
+        </ul>
+      </div>
+      <div class="cram-point">
+        <h3>9 · RP2 — root-tip squash &amp; mitotic index</h3>
+        <ul>
+          <li>Method: cut meristem tip → soften in warm dilute HCl → stain (toluidine blue/acetic orcein) → squash → view under microscope.</li>
+          <li>Mitotic index = cells with visible chromosomes ÷ total cells counted. Show full working; watch decimal places.</li>
+          <li>Reliability improvements are pair-marked: many fields of view (representative); repeat &amp; mean (smooths anomalies); standardise edge-cell rule (consistency).</li>
+        </ul>
+      </div>
+      <div class="cram-point">
+        <h3>10 · Calculating actual cell size</h3>
+        <ul>
+          <li>Actual size = image size ÷ magnification.</li>
+          <li>Convert units before/after dividing — final answer usually in µm for a cell.</li>
+        </ul>
+      </div>
+      <div class="callout note">
+        <div class="ic">🧠</div>
+        <div><p><strong>IPMAT, count your chromosomes.</strong> 4 → 4 (chromatid pairs) → 8 chromatids → 4+4 daughters. Never "homologous" in a mitosis answer.</p></div>
+      </div>
+    </div>
+
+    <!-- ============ DRILL VIEW (markscheme-wording Q&A) ============ -->
+    <div id="drillView" class="tool-panel" style="display:none;">
+      <div class="tool-header"><span style="font-size:26px;">🎯</span><div><h1 class="page-title" style="font-size:26px;margin-bottom:2px;">Markscheme-Wording Drill</h1></div></div>
+      <p class="tool-sub">Invented prompts, written in the style of how this spec point actually gets tested — not real past-paper questions. Click a question to reveal a model answer written in the precise wording that earns full marks, then try saying it back in your own words before you check.</p>
+
+      <div class="drill-group">
+        <h3>Not every cell can divide</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ Explain why a mature red blood cell and a root-tip meristem cell differ in their ability to divide.</div>
+          <div class="qa-a">The red blood cell has fully differentiated into a specialised cell type and has permanently lost the ability to divide; the meristem cell remains undifferentiated and retains the ability to divide, which is why actively dividing tissue is concentrated at the root tip.</div>
+          <div class="qa-q">❓ Suggest why the mitotic index differs between the root-tip meristem and a region of fully differentiated root tissue further up the root.</div>
+          <div class="qa-a">The meristem contains cells that have retained the ability to divide, so a higher proportion are actively in mitosis at any time; the differentiated region contains specialised cells that have permanently lost this ability, so far fewer (or none) are dividing.</div>
+        </div>
+      </div>
+
+      <div class="drill-group">
+        <h3>The cell cycle &amp; DNA replication</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ A graph shows DNA content per cell against time. Describe what is happening to the cells during a section where DNA content is constant and low, and during a section where it suddenly falls.</div>
+          <div class="qa-a">A constant, low DNA content means the cells are in interphase before DNA replication (G1) — DNA content has not yet increased. A sudden fall in DNA content means the cells have completed mitosis and cytokinesis, since the replicated DNA has now been shared equally between two daughter cells; a fall is never seen during prophase, metaphase or anaphase alone, as DNA is only redistributed, not reduced, until the cell physically divides.</div>
+          <div class="qa-q">❓ Using a DNA-content graph, describe how you would determine the length of the cell cycle.</div>
+          <div class="qa-a">Measure the time between two successive starts (or two successive ends) of DNA replication on the graph, because DNA replication occurs exactly once per cell cycle, so this interval equals the length of one complete cycle.</div>
+          <div class="qa-q">❓ State what a DNA content twice the original value indicates about a cell, and identify the earliest cell-cycle stage at which this could be observed.</div>
+          <div class="qa-a">Twice the original DNA content indicates that DNA replication has occurred; the earliest stage at which this could be observed is late interphase (immediately after S phase), and it remains true through prophase, metaphase and anaphase.</div>
+        </div>
+      </div>
+
+      <div class="drill-group">
+        <h3>The five stages of mitosis</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ Describe the behaviour of chromosomes during each of the five stages of mitosis.</div>
+          <div class="qa-a">Interphase: chromosomes not yet visible; DNA has replicated so each will consist of two sister chromatids. Prophase: chromosomes condense and become visible, each as two sister chromatids joined at a centromere; the nuclear envelope breaks down. Metaphase: chromosomes line up at the equator; spindle fibres attach to centromeres. Anaphase: centromeres divide; spindle fibres pull sister chromatids (now individual chromosomes) to opposite poles. Telophase: chromosomes decondense at each pole; the nuclear envelope reforms around each set.</div>
+          <div class="qa-q">❓ A photomicrograph shows chromatids visibly being pulled to opposite ends of a cell. Name this stage and explain what is happening.</div>
+          <div class="qa-a">This is anaphase. Sister (identical) chromatids are separating and are pulled to opposite poles by the shortening of spindle fibres attached to their centromeres.</div>
+          <div class="qa-q">❓ A drug prevents spindle fibres from attaching to centromeres. Explain the effect this would have on a dividing cell.</div>
+          <div class="qa-a">Chromosomes cannot be pulled to line up at the equator, so metaphase cannot occur; since spindle fibres also cannot subsequently pull chromatids apart, anaphase cannot occur either, and mitosis cannot be completed, so no new cells are produced.</div>
+        </div>
+      </div>
+
+      <div class="drill-group">
+        <h3>Cytokinesis</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ Compare how cytokinesis occurs in an animal cell and in a plant cell, explaining the reason for the difference.</div>
+          <div class="qa-a">In an animal cell, the cell surface membrane constricts inward around the equator (a cleavage furrow) until the cytoplasm is pinched into two cells. In a plant cell, a rigid cell wall prevents the membrane from constricting, so instead a new cell plate forms across the centre of the cell and grows outward until it fuses with the existing wall, dividing the cell in two.</div>
+          <div class="qa-q">❓ Explain why the specification states that cytokinesis "usually" — rather than always — occurs after mitosis.</div>
+          <div class="qa-a">Mitosis (nuclear division) and cytokinesis (division of the cytoplasm) are distinct events; in some cases nuclear division can occur without being immediately followed by a complete division of the cytoplasm, so the two are not strictly guaranteed to occur together every time.</div>
+        </div>
+      </div>
+
+      <div class="drill-group">
+        <h3>Mitosis vs meiosis boundary</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ A student writes "in anaphase, homologous chromosomes separate and move to opposite poles." Identify and correct the error.</div>
+          <div class="qa-a">This describes meiosis I, not mitosis. In mitosis, it is sister (identical) chromatids — not homologous chromosomes — that separate and move to opposite poles.</div>
+          <div class="qa-q">❓ A mutation is found in every cell of an individual's body. Explain how this mutation came to be present in every cell, and identify the type of division responsible for spreading it.</div>
+          <div class="qa-a">The mutation arose in the zygote (or in a gamete before fertilisation) and was then propagated to every cell of the body through repeated rounds of mitosis, which produces genetically identical daughter cells; it did not arise during meiosis.</div>
+        </div>
+      </div>
+
+      <div class="drill-group">
+        <h3>Mitosis, cancer &amp; treatment</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ Explain why many cancer treatments are more effective against cancer cells than against healthy cells.</div>
+          <div class="qa-a">Cancer cells divide more rapidly and uncontrollably than most healthy cells; a drug that interferes with the cell cycle therefore affects cancer cells disproportionately, since healthy, slower-dividing cells are relatively spared.</div>
+          <div class="qa-q">❓ Explain how a shortened interphase could lead to the formation of a tumour.</div>
+          <div class="qa-a">A shortened interphase, or DNA replication starting earlier or occurring faster, results in a faster overall cell cycle and therefore uncontrolled cell division, producing a mass of abnormal, excessive cells — a tumour.</div>
+          <div class="qa-q">❓ Data show that a new drug was tested on cancer cells grown in culture, with little further increase in effect above a threshold concentration. Evaluate this drug as a potential cancer treatment.</div>
+          <div class="qa-a">For: above the threshold concentration, most cancer cells stop dividing, and the drug has a greater effect on rapidly dividing cancer cells than on slower-dividing healthy cells. Against: the drug was tested in culture, so its effect on a whole organism is unknown; some cancer cells may still be dividing even at the concentrations tested, so the cancer could continue to grow or spread; more trials are needed, and healthy dividing cells may also be damaged, causing side effects.</div>
+        </div>
+      </div>
+
+      <div class="drill-group">
+        <h3>Binary fission</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ Describe the process of binary fission in a prokaryotic cell.</div>
+          <div class="qa-a">The circular DNA molecule and any plasmids are replicated; the cytoplasm then divides, producing two daughter cells, each with a single copy of the circular DNA and a variable number of copies of plasmids.</div>
+          <div class="qa-q">❓ Compare mitosis and binary fission in terms of the DNA replicated, the involvement of spindle fibres, and the number of daughter cells produced.</div>
+          <div class="qa-a">Mitosis replicates linear DNA (chromosomes) in a eukaryotic cell using spindle fibres, producing two daughter cells. Binary fission replicates circular DNA (and plasmids) in a prokaryotic cell without any spindle fibres, also producing two daughter cells — neither process ever produces four.</div>
+        </div>
+      </div>
+
+      <div class="drill-group">
+        <h3>Viruses &amp; cell division</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ Explain why viruses cannot reproduce by cell division, and describe how new virus particles are produced.</div>
+          <div class="qa-a">Viruses are non-living (acellular) and cannot carry out cell division. Following injection of the virus's nucleic acid into a host cell, the infected host cell's own machinery — ribosomes, enzymes and nucleotides — is used to replicate the viral nucleic acid and synthesise viral proteins, which assemble into new virus particles.</div>
+          <div class="qa-q">❓ A student describes viral replication as "the virus dividing in two." Explain why this description is inaccurate.</div>
+          <div class="qa-a">Viruses are non-living and do not undergo cell division of any kind; a virus does not split into two, but instead hijacks a host cell's machinery after injecting its nucleic acid, and it is the host cell that manufactures many new, complete virus particles.</div>
+        </div>
+      </div>
+
+      <div class="drill-group">
+        <h3>RP2 — root-tip squash &amp; mitotic index</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ Describe how you would prepare a root tip to identify the stages of mitosis using an optical microscope.</div>
+          <div class="qa-a">Cut a small piece of root containing the meristem; soften it in warm dilute hydrochloric acid to separate the cells; stain with a DNA-specific stain such as toluidine blue or acetic orcein; add a coverslip and squash to produce a single layer of cells; examine under an optical microscope, working across multiple fields of view.</div>
+          <div class="qa-q">❓ In a sample of 250 root-tip cells, 40 showed visible condensed chromosomes. Calculate the mitotic index, showing your working, and suggest one way to improve the reliability of this count.</div>
+          <div class="qa-a">Mitotic index = 40 ÷ 250 = 0.16 (or 16%). Reliability: examine a large number of different fields of view across the slide, so that the sample is representative of the whole root tip rather than one region.</div>
+          <div class="qa-q">❓ Explain why counting only whole cells at the edge of a field of view, applied consistently, improves the reliability of a mitotic index calculation.</div>
+          <div class="qa-a">Standardising how part-cells at a field's edge are treated ensures the same counting rule is applied every time, so the count is not biased by where the field boundary happens to fall, making repeated counts more consistent with each other.</div>
+        </div>
+      </div>
+
+      <div class="drill-group">
+        <h3>Calculating actual cell size</h3>
+        <div class="qa-list">
+          <div class="qa-q">❓ A student measures a cell on a micrograph as 36 mm long. The micrograph magnification is ×2000. Calculate the actual length of the cell in µm, showing your working.</div>
+          <div class="qa-a">Actual size = image size ÷ magnification = 36 mm ÷ 2000 = 0.018 mm = 18 µm.</div>
+          <div class="qa-q">❓ Explain why it is important to convert units before dividing when calculating actual cell size from a micrograph.</div>
+          <div class="qa-a">Image size and magnification must be expressed in consistent units before dividing, and the final answer should be converted into a sensible unit for a cell-sized structure (typically µm); mixing units, or failing to convert, produces an answer that is out by a factor of 1000 or more and is not biologically plausible.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ TUTOR AI PANEL ============ -->
+    <div class="tool-panel" id="tutorView" style="display:none;">
+      <div class="tool-header"><span style="font-size:26px;">🧑‍🏫</span><div><h1 class="page-title" style="font-size:26px;margin-bottom:2px;">Tutor AI</h1></div><span class="badge">Demo · no API</span></div>
+      <p class="tool-sub">Pick a topic, then keep asking to break it down further — each tap goes one level simpler. This is a scripted demo: it walks through pre-written tiers rather than generating anything live.</p>
+
+      <div class="topic-picker" id="tutorTopics"></div>
+
+      <div class="tutor-box">
+        <div class="tutor-level" id="tutorLevel">Level 1 · standard explanation</div>
+        <div class="tutor-text" id="tutorText">Pick a topic above to begin.</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" id="tutorSimplify">Break this down further ↓</button>
+        <button class="btn" id="tutorReset">Reset to standard level</button>
+      </div>
+
+      <h3 class="sub-title">Ask a question</h3>
+      <div class="qa-list" id="tutorQA"></div>
+    </div>
+
+    <!-- ============ BLURT AI PANEL ============ -->
+    <div class="tool-panel" id="blurtView" style="display:none;">
+      <div class="tool-header"><span style="font-size:26px;">🧠</span><div><h1 class="page-title" style="font-size:26px;margin-bottom:2px;">Blurt AI</h1></div><span class="badge">Demo · no API</span></div>
+      <p class="tool-sub">Pick a topic, then write down absolutely everything you remember about it without looking back at your notes. When you're done, this checks your blurt against the key points and shows what's covered and what's missing — all matched locally in your browser, nothing is sent anywhere.</p>
+
+      <div class="topic-picker" id="blurtTopics"></div>
+
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
+        <button class="btn" id="blurtTimerBtn">▶ Start 3-minute timer</button>
+        <span class="timer" id="blurtTimer">03:00</span>
+      </div>
+      <textarea class="blurt" id="blurtText" placeholder="Start typing everything you remember about this topic…"></textarea>
+      <div class="btn-row" style="margin-top:12px;">
+        <button class="btn primary" id="blurtCheck">Check my blurt</button>
+        <button class="btn" id="blurtClear">Clear</button>
+      </div>
+
+      <div class="result-card" id="blurtResult">
+        <div style="font-weight:700;margin-bottom:2px;">Rough coverage estimate</div>
+        <div style="font-size:12.5px;color:var(--text-faint);margin-bottom:6px;">Based on whether key terms appear in your blurt — not a real mark, just a nudge on where to look again.</div>
+        <div class="coverage-bar-track"><div class="coverage-bar-fill" id="blurtBarFill" style="width:0%"></div></div>
+        <div style="font-size:13.5px;margin-bottom:10px;"><strong id="blurtPct">0%</strong> of key terms showed up</div>
+        <div class="kw-grid" id="blurtKwGrid"></div>
+      </div>
+    </div>
+
+    <!-- ============ FEYNMAN AI PANEL ============ -->
+    <div class="tool-panel" id="feynmanView" style="display:none;">
+      <div class="tool-header"><span style="font-size:26px;">🎤</span><div><h1 class="page-title" style="font-size:26px;margin-bottom:2px;">Feynman AI</h1></div><span class="badge">Demo · no API</span></div>
+      <p class="tool-sub">Pick a topic, press the mic, and explain it out loud as if you were teaching it to someone who's never heard of it — plain words, no jargon you can't unpack. Uses your browser's built-in speech recognition if it's available; otherwise just type your explanation instead.</p>
+
+      <div class="topic-picker" id="feynmanTopics"></div>
+
+      <div class="mic-row">
+        <div class="mic-btn" id="micBtn">🎙️</div>
+        <div class="mic-status" id="micStatus">Tap the mic and start explaining, or just type below.</div>
+      </div>
+      <textarea class="blurt" id="feynmanText" placeholder="Your explanation will appear here as you speak, or type it directly…"></textarea>
+      <div class="btn-row" style="margin-top:12px;">
+        <button class="btn primary" id="feynmanCheck">Check my explanation</button>
+        <button class="btn" id="feynmanClear">Clear</button>
+      </div>
+
+      <div class="result-card" id="feynmanResult">
+        <div style="font-weight:700;margin-bottom:2px;">Plain-English coverage</div>
+        <div style="font-size:12.5px;color:var(--text-faint);margin-bottom:6px;">Checks whether the core ideas came through — not exact wording, since Feynman-style explaining should sound nothing like the textbook.</div>
+        <div class="coverage-bar-track"><div class="coverage-bar-fill" id="feynBarFill" style="width:0%"></div></div>
+        <div style="font-size:13.5px;margin-bottom:10px;"><strong id="feynPct">0%</strong> of core ideas showed up</div>
+        <div class="kw-grid" id="feynKwGrid"></div>
+        <p style="margin:12px 0 0;font-size:13px;color:var(--text-dim);">If you caught yourself reaching for a technical term you couldn't unpack in plain words, that's the exact spot to go back and re-read.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* ================= DATA: topics with tiered explanations, Q&A and key terms ================= */
+const TOPICS = {
+  divide: {
+    label: "Not every cell can divide",
+    section: "s1",
+    tiers: [
+      "Only cells that stay undifferentiated — meristem cells in plants, stem cells in animals — retain the ability to divide; most specialised cells (e.g. mature red blood cells, neurones) lose that ability permanently.",
+      "Think of most cells as workers trained for one permanent job — once specialised, they never go back to dividing. A small pool of cells (meristem, stem cells) stays untrained on purpose, ready to keep producing new cells.",
+      "Like a photocopier that gets dismantled and turned into a filing cabinet once it's done its last copy — it can never make copies again. Only a few photocopiers are kept running permanently (meristem/stem cells) so the organism can keep producing new parts."
+    ],
+    qa: [
+      ["Why does a root tip have a much higher mitotic index than older root tissue?", "Because the root tip contains the meristem — undifferentiated tissue that retains the ability to divide — while older tissue further up has differentiated and mostly lost that ability."],
+      ["Give two examples of specialised cells that lose the ability to divide.", "Mature red blood cells and most neurones — both differentiate into their final specialised form and do not divide again."]
+    ],
+    keywords: ["differentiate","meristem","stem cells","retain the ability to divide","specialised","root tip","mitotic index"]
+  },
+  cellcycle: {
+    label: "The cell cycle & DNA replication",
+    section: "s2",
+    tiers: [
+      "The cell cycle has a long interphase (G1, S, G2) where the cell grows and DNA replicates in S phase, followed by the much shorter mitosis; DNA content on a graph only falls once the cell actually divides.",
+      "Interphase is the long growing-and-copying phase; DNA specifically gets copied during S phase, one sub-part of it. Mitosis is the short splitting phase that comes after. A graph of DNA content stays flat, then rises during S phase, stays flat again (doubled), then suddenly drops once the cell has actually divided.",
+      "Picture photocopying a stack of documents before splitting it fairly between two people: the copying (S phase) takes a while, then once every page has a duplicate, the pile gets split in seconds (mitosis) — that's why a DNA graph is flat, then rises, then falls sharply, not gradually."
+    ],
+    qa: [
+      ["Why can't 'prophase' be the answer for a falling section of a DNA-content graph?", "Because DNA content doesn't fall until the cell physically divides — prophase, metaphase and anaphase only redistribute already-copied DNA, they don't reduce the total amount per cell."],
+      ["How do you find the length of the cell cycle from a DNA-content graph?", "Measure the time between two successive starts (or ends) of DNA replication — since replication happens exactly once per cycle, that time equals the cycle length."]
+    ],
+    keywords: ["interphase","G1","S phase","G2","DNA replication","mitosis","DNA content graph","doubled DNA content","cycle length"]
+  },
+  stages: {
+    label: "The five stages of mitosis",
+    section: "s3",
+    tiers: [
+      "IPMAT: interphase (DNA already replicated), prophase (chromosomes condense, envelope breaks down), metaphase (line up at equator, spindle attaches to centromeres), anaphase (centromeres divide, chromatids pulled to poles), telophase (envelope reforms, chromosomes decondense).",
+      "After DNA is copied in interphase, prophase makes the chromosomes visible and breaks down the nuclear envelope; metaphase lines them up in the middle; anaphase splits each chromosome's two identical halves (sister chromatids) apart to opposite ends; telophase rebuilds a nucleus around each new set. Spindle fibres, attached to each chromosome's centromere, do the actual pulling in anaphase.",
+      "Like packing for two house moves: prophase labels and organises every box (chromosomes condense); metaphase lines every box up in one row in the hallway (equator); anaphase splits each matching pair of boxes and sends one copy to each house (chromatids to opposite poles); telophase is unpacking and settling into both new houses (decondense, new envelope)."
+    ],
+    qa: [
+      ["What single mistake most often loses marks when describing the stages of mitosis?", "Naming the wrong stage for a correctly-described event — the answer is marked as five stage-by-stage pairs, and a wrong stage name caps that part of the answer even if the description itself is accurate."],
+      ["A spindle-disrupting drug is added to dividing cells. What's the predicted effect?", "Without spindle fibres attaching to and pulling on centromeres, chromosomes can't line up at the equator (no metaphase) and can't be separated (no anaphase), so mitosis cannot be completed and no new cells are produced."]
+    ],
+    keywords: ["interphase","prophase","metaphase","anaphase","telophase","spindle fibres","centromeres","sister chromatids","condense","equator","opposite poles"]
+  },
+  cytokinesis: {
+    label: "Cytokinesis",
+    section: "s4",
+    tiers: [
+      "Cytokinesis divides the cytoplasm after mitosis, physically producing two cells: in animal cells the membrane constricts inward (cleavage furrow); in plant cells a new cell plate grows across the middle instead.",
+      "Mitosis sorts out the nucleus and chromosomes; cytokinesis is the separate step that splits the rest of the cell. Animal cells simply pinch inward because their membrane is flexible. Plant cells can't pinch because of their rigid cell wall, so instead they build a brand-new wall down the middle.",
+      "Splitting a balloon animal by pinching the middle (animal cell) versus building a new brick wall straight down the centre of an already-built room (plant cell, because the walls are too rigid to pinch)."
+    ],
+    qa: [
+      ["Why can't a plant cell divide its cytoplasm by pinching the membrane, the way an animal cell does?", "A plant cell is surrounded by a rigid cell wall, which prevents the membrane from constricting inward, so instead a new cell plate forms across the centre and grows outward until it fuses with the existing wall."],
+      ["Why does the spec say cytokinesis 'usually' — not always — follows mitosis?", "Because mitosis (nuclear division) and cytokinesis (division of the cytoplasm) are distinct events, and in some cases nuclear division can occur without an immediate, complete division of the cytoplasm."]
+    ],
+    keywords: ["cytokinesis","cleavage furrow","cell plate","cell wall","cytoplasm divides","two new cells"]
+  },
+  boundary: {
+    label: "Mitosis vs meiosis boundary",
+    section: "s5",
+    tiers: [
+      "Mitosis makes two genetically identical diploid cells using sister chromatids; meiosis (a separate topic) makes four genetically different haploid cells, and only in meiosis do homologous chromosomes separate.",
+      "Mitosis and meiosis are different machines entirely — mitosis produces exact copies for growth and repair, meiosis produces varied gametes for sexual reproduction. The vocabulary doesn't cross over: mitosis always separates sister chromatids, never homologous chromosomes.",
+      "Mitosis is a photocopier making an identical duplicate. Meiosis is more like shuffling two different card decks together and dealing out four different hands — genuinely different processes, so using photocopier language for the card-shuffling process (or vice versa) is always wrong."
+    ],
+    qa: [
+      ["Why is 'homologous chromosomes separate' never correct for a mitosis question?", "Because homologous chromosomes only separate during meiosis I; in mitosis, it is always sister (identical) chromatids that separate."],
+      ["A mutation is present in every cell of an organism's body. Which division process spread it there?", "Mitosis — the mutation arose in the zygote or a gamete, and was then propagated to every body cell through repeated rounds of mitosis, not meiosis."]
+    ],
+    keywords: ["sister chromatids","homologous chromosomes","meiosis","genetically identical","diploid","haploid","mitosis"]
+  },
+  cancer: {
+    label: "Mitosis, cancer & treatment",
+    section: "s6",
+    tiers: [
+      "Mitosis is normally tightly controlled; when that control fails, cell division becomes uncontrolled and produces a tumour. Cancer treatments target dividing cells because cancer cells divide faster than most healthy cells.",
+      "Cancer happens when the checks that normally control cell division break down, so cells divide faster and more often than they should, piling up into a tumour. Because cancer cells divide unusually fast, drugs that interfere with cell division hit them harder than the slower-dividing healthy cells around them — though healthy dividing tissue still suffers some side effects.",
+      "Imagine a factory whose 'stop' switch has broken, so it just keeps producing more and more (a tumour). A cancer drug is like a wrench thrown into every fast-running machine — it slows all of them down, but the ones already running fastest (cancer cells) are hit hardest."
+    ],
+    qa: [
+      ["Why is 'uncontrolled growth' not accepted for describing how a tumour forms?", "The mark scheme requires the specific phrase 'uncontrolled cell division,' not the vaguer 'growth' — division and growth aren't treated as the same idea."],
+      ["A cancer drug was tested only on cells grown in culture. Why does this limit the conclusions that can be drawn?", "Because the drug's effect was only observed 'in culture,' not in a whole living organism, so its effect on real patients — including any side effects — remains unknown."]
+    ],
+    keywords: ["controlled process","uncontrolled cell division","tumour","cancer","dividing cells","in culture","rapidly dividing"]
+  },
+  fission: {
+    label: "Binary fission",
+    section: "s7",
+    tiers: [
+      "Prokaryotic cells divide by binary fission: the circular DNA and plasmids replicate, then the cytoplasm divides, producing two daughter cells each with one DNA copy and a variable number of plasmids.",
+      "Bacteria have no nucleus or spindle, so they can't use mitosis. Instead the single circular chromosome and any plasmids are copied, then the cell splits its cytoplasm in two — every daughter gets one full DNA copy, but the number of plasmid copies can vary between them.",
+      "Photocopying one circular instruction sheet (plus a few spare notes) and splitting a room in half — no complicated packing process, unlike mitosis's carefully organised chromosome sorting."
+    ],
+    qa: [
+      ["Describe binary fission as a three-step sequence.", "1. The circular DNA and any plasmids replicate. 2. The cytoplasm divides. 3. Two daughter cells result, each with one copy of the circular DNA and a variable number of plasmid copies."],
+      ["Give one similarity and one difference between mitosis and binary fission.", "Similarity: both always produce exactly two daughter cells. Difference: mitosis involves spindle fibres and linear DNA in a eukaryotic cell, while binary fission involves no spindle and circular DNA in a prokaryotic cell."]
+    ],
+    keywords: ["binary fission","circular DNA","plasmids","prokaryotic","cytoplasm divides","two daughter cells","no spindle"]
+  },
+  viruses: {
+    label: "Viruses & cell division",
+    section: "s8",
+    tiers: [
+      "Viruses are non-living and cannot divide; after injecting their nucleic acid into a host cell, it's the host cell's own machinery that replicates new virus particles.",
+      "Because viruses have no cell structure and can't carry out life processes alone, they can't divide by mitosis or binary fission. Instead a virus injects its genetic material into a living host cell, hijacking that cell's ribosomes and enzymes to build copies of itself.",
+      "A virus is like a USB stick of instructions with no factory of its own — it has to plug into someone else's factory (a living cell) and use that factory's machines to run off thousands of copies."
+    ],
+    qa: [
+      ["Why can't viruses reproduce by binary fission or mitosis?", "Viruses are non-living (acellular) and cannot independently carry out the processes of life, so neither division process is possible for them."],
+      ["How are new virus particles actually produced?", "The virus injects its nucleic acid into a host cell; the infected host cell's own ribosomes, enzymes and nucleotides are then used to replicate the viral nucleic acid and build new virus particles."]
+    ],
+    keywords: ["non-living","acellular","nucleic acid injected","host cell","replicates the virus particles","not cell division"]
+  },
+  rp2: {
+    label: "RP2 — root-tip squash & mitotic index",
+    section: "s9",
+    tiers: [
+      "Root-tip meristem is softened in acid, stained, and squashed into a single layer, then viewed under a microscope; mitotic index = cells with visible chromosomes ÷ total cells counted.",
+      "A small piece of actively-dividing root tip is treated with warm acid to separate the cells, dyed so chromosomes are visible, then squashed flat so cells don't overlap. Under the microscope, each cell is scored as dividing or not, and the fraction dividing gives the mitotic index — a measure of how active that tissue is.",
+      "Like flattening a crowd of people into a single line so you can count exactly how many are 'mid-action' right now, after colouring in anyone who's actively doing something so they stand out clearly."
+    ],
+    qa: [
+      ["Out of 200 root-tip cells counted, 24 show visible chromosomes. Calculate the mitotic index.", "Mitotic index = 24 ÷ 200 = 0.12 (or 12%)."],
+      ["Suggest one way to improve the reliability of a mitotic index count, with a reason.", "Examine many different fields of view across the slide, so that the sample counted is representative of the whole root tip rather than just one region."]
+    ],
+    keywords: ["meristem","hydrochloric acid","stain","squash","optical microscope","mitotic index","fields of view","reliability"]
+  },
+  sizecalc: {
+    label: "Calculating actual cell size",
+    section: "s10",
+    tiers: [
+      "Actual size = size of image ÷ magnification, always keeping units consistent and converting the answer into a sensible unit like µm.",
+      "What you measure on a micrograph is the image size, magnified from the real thing — to undo that magnification, divide the image size by the magnification factor, then convert into a sensible unit for a cell.",
+      "If a photo has zoomed an ant in 10 times and it looks 50 mm long in the photo, the real ant is only 5 mm — you just divide by the zoom factor to undo it."
+    ],
+    qa: [
+      ["A cell measures 30 mm on a micrograph at ×3000 magnification. Calculate its actual size in µm.", "Actual size = 30 mm ÷ 3000 = 0.01 mm = 10 µm."],
+      ["Why is it important to convert units before dividing when calculating actual cell size?", "Image size and magnification must be in consistent units before dividing, otherwise the answer will be wrong by a large factor; the final answer should also be converted into a sensible unit, typically µm, for a cell-sized structure."]
+    ],
+    keywords: ["actual size","image size","magnification","apparent size","units","micrometres"]
+  }
+};
+const TOPIC_ORDER = ["divide","cellcycle","stages","cytokinesis","boundary","cancer","fission","viruses","rp2","sizecalc"];
+
+/* ================= NAVIGATION (Full notes / Cram / Drill / AI tools) ================= */
+const notesView = document.getElementById('notesView');
+const allViews = {
+  notes: notesView,
+  cram: document.getElementById('cramView'),
+  drill: document.getElementById('drillView'),
+  tutor: document.getElementById('tutorView'),
+  blurt: document.getElementById('blurtView'),
+  feynman: document.getElementById('feynmanView')
+};
+function showView(name){
+  Object.entries(allViews).forEach(([k,v])=> v.style.display = (k===name?'block':'none') );
+  document.querySelectorAll('.side-tool').forEach(t=> t.classList.toggle('active', t.dataset.tool===name) );
+  document.querySelectorAll('.mode-tab').forEach(t=> t.classList.toggle('active', t.dataset.mode===name) );
+  window.scrollTo({top:0});
+}
+function showNotes(){ showView('notes'); }
+function showTool(name){ showView(name); }
+document.querySelectorAll('.side-tool').forEach(t=>{
+  t.addEventListener('click', ()=> showView(t.dataset.tool));
+});
+document.querySelectorAll('.mode-tab').forEach(t=>{
+  t.addEventListener('click', ()=> showView(t.dataset.mode));
+});
+document.querySelectorAll('[data-target]').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    const id = el.dataset.target;
+    showView('notes');
+    if(id!=='notesTop'){ document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'}); }
+    else { window.scrollTo({top:0, behavior:'smooth'}); }
+    if(window.innerWidth<=900) sidebar.classList.remove('open');
+  });
+});
+document.querySelectorAll('.toc-item').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    document.getElementById(el.dataset.jump).scrollIntoView({behavior:'smooth', block:'start'});
+  });
+});
+
+/* click-to-reveal Q&A used by the Drill view (static markup, not built by JS) */
+document.querySelectorAll('#drillView .qa-q').forEach(q=>{
+  const a = q.nextElementSibling;
+  q.addEventListener('click', ()=> a.classList.toggle('show'));
+});
+
+/* ================= PER-SECTION EXPLANATION-LEVEL SWITCHER ================= */
+document.querySelectorAll('.level-switcher').forEach(sw=>{
+  const group = sw.dataset.group;
+  const blocks = document.querySelectorAll(`.level-block[data-group="${group}"]`);
+  const dots = sw.querySelectorAll('.level-dot');
+  const label = sw.querySelector('.level-label');
+  const btn = sw.querySelector('.level-btn');
+  const names = {1:'🧸 Level 1 · the big idea only', 2:'📘 Level 2 · key terms explained', 3:'🎓 Level 3 · full exam detail'};
+  let level = 3;
+  function render(){
+    blocks.forEach(b=> b.style.display = (parseInt(b.dataset.level,10)===level ? 'block' : 'none') );
+    dots.forEach(d=> d.classList.toggle('active', parseInt(d.dataset.level,10)===level) );
+    label.textContent = names[level];
+    btn.textContent = level>1 ? 'Explain more simply ↓' : '🎓 Back to full exam detail';
+  }
+  btn.addEventListener('click', ()=>{ level = level>1 ? level-1 : 3; render(); });
+  dots.forEach(d=>{
+    d.addEventListener('click', ()=>{ level = parseInt(d.dataset.level,10); render(); });
+  });
+  render();
+});
+
+/* highlight active sidebar link on scroll */
+const secEls = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13'].map(id=>document.getElementById(id));
+const links = document.querySelectorAll('.side-link[data-target]');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      links.forEach(l=>l.classList.toggle('active', l.dataset.target===e.target.id));
+    }
+  });
+},{rootMargin:'-10% 0px -70% 0px'});
+secEls.forEach(el=> el && io.observe(el));
+
+/* mobile menu */
+const sidebar = document.getElementById('sidebar');
+document.getElementById('menuBtn').addEventListener('click', ()=> sidebar.classList.toggle('open'));
+
+/* dark mode */
+document.getElementById('darkToggle').addEventListener('click', ()=>{
+  document.documentElement.classList.toggle('dark');
+});
+
+/* ================= MITOSIS STAGE STEPPER (Section 3) ================= */
+const mitStages = [
+  "<strong>Interphase.</strong> The nuclear envelope is intact and there is no spindle. DNA has already replicated (S phase) — each chromosome now consists of 2 identical sister chromatids — but chromosomes are not yet visible as distinct structures.",
+  "<strong>Prophase.</strong> Chromosomes condense and become visible, each as 2 sister chromatids joined at one centromere. The nuclear envelope breaks down and spindle fibres begin forming.",
+  "<strong>Metaphase.</strong> The nuclear envelope is fully gone and the spindle is complete. Chromosomes line up at the equator (metaphase plate); spindle fibres attach to centromeres.",
+  "<strong>Anaphase.</strong> Centromeres divide; spindle fibres shorten, pulling sister chromatids (now individual chromosomes) to opposite poles.",
+  "<strong>Telophase (+ cytokinesis).</strong> A nuclear envelope reforms around each set of chromosomes, which decondense. The cytoplasm then divides (Section 4), usually producing two new, genetically identical cells."
+];
+let mitStepIdx = 0;
+const stageMinis = document.querySelectorAll('.stage-mini');
+function renderMitStep(){
+  document.getElementById('mitStepCaption').innerHTML = mitStages[mitStepIdx];
+  document.getElementById('mitStepIndicator').textContent = `Stage ${mitStepIdx+1} of 5`;
+  document.getElementById('mitStepPrev').disabled = mitStepIdx===0;
+  document.getElementById('mitStepNext').disabled = mitStepIdx===mitStages.length-1;
+  stageMinis.forEach(m=> m.classList.toggle('active', parseInt(m.dataset.i,10)===mitStepIdx));
+}
+stageMinis.forEach(m=>{
+  m.addEventListener('click', ()=>{ mitStepIdx = parseInt(m.dataset.i,10); renderMitStep(); });
+});
+document.getElementById('mitStepNext').addEventListener('click', ()=>{ if(mitStepIdx<mitStages.length-1){ mitStepIdx++; renderMitStep(); } });
+document.getElementById('mitStepPrev').addEventListener('click', ()=>{ if(mitStepIdx>0){ mitStepIdx--; renderMitStep(); } });
+renderMitStep();
+
+/* ================= TUTOR AI ================= */
+let tutorTopic = 'divide';
+let tutorTier = 0;
+const tutorTopicsEl = document.getElementById('tutorTopics');
+TOPIC_ORDER.forEach(key=>{
+  const chip = document.createElement('div');
+  chip.className='topic-chip'+(key===tutorTopic?' active':'');
+  chip.textContent = TOPICS[key].label;
+  chip.addEventListener('click', ()=>{ tutorTopic=key; tutorTier=0; renderTutor(); highlightChip(tutorTopicsEl, chip); });
+  tutorTopicsEl.appendChild(chip);
+});
+function highlightChip(container, active){
+  container.querySelectorAll('.topic-chip').forEach(c=>c.classList.remove('active'));
+  active.classList.add('active');
+}
+function renderTutor(){
+  const t = TOPICS[tutorTopic];
+  document.getElementById('tutorLevel').textContent = `Level ${tutorTier+1} · ` + (tutorTier===0?'standard explanation':tutorTier===1?'simpler explanation':'as-simple-as-it-gets, with an everyday analogy');
+  document.getElementById('tutorText').textContent = t.tiers[tutorTier];
+  document.getElementById('tutorSimplify').disabled = tutorTier>=t.tiers.length-1;
+  const qaEl = document.getElementById('tutorQA');
+  qaEl.innerHTML='';
+  t.qa.forEach(([q,a])=>{
+    const q1=document.createElement('div'); q1.className='qa-q'; q1.textContent='❓ '+q;
+    const a1=document.createElement('div'); a1.className='qa-a'; a1.textContent=a;
+    q1.addEventListener('click', ()=> a1.classList.toggle('show'));
+    qaEl.appendChild(q1); qaEl.appendChild(a1);
+  });
+}
+document.getElementById('tutorSimplify').addEventListener('click', ()=>{
+  const t = TOPICS[tutorTopic];
+  if(tutorTier < t.tiers.length-1){ tutorTier++; renderTutor(); }
+});
+document.getElementById('tutorReset').addEventListener('click', ()=>{ tutorTier=0; renderTutor(); });
+renderTutor();
+
+/* ================= shared keyword-coverage checker ================= */
+function checkCoverage(text, keywords){
+  const lower = text.toLowerCase();
+  const hits = keywords.filter(k=> lower.includes(k.toLowerCase()) );
+  return { hits, pct: Math.round((hits.length/keywords.length)*100) };
+}
+function renderKwGrid(container, keywords, hits){
+  container.innerHTML='';
+  keywords.forEach(k=>{
+    const span = document.createElement('span');
+    const isHit = hits.includes(k);
+    span.className = 'kw '+(isHit?'hit':'miss');
+    span.textContent = (isHit?'✓ ':'· ')+k;
+    container.appendChild(span);
+  });
+}
+
+/* ================= BLURT AI ================= */
+let blurtTopic = 'stages';
+const blurtTopicsEl = document.getElementById('blurtTopics');
+TOPIC_ORDER.forEach(key=>{
+  const chip = document.createElement('div');
+  chip.className='topic-chip'+(key===blurtTopic?' active':'');
+  chip.textContent = TOPICS[key].label;
+  chip.addEventListener('click', ()=>{ blurtTopic=key; highlightChip(blurtTopicsEl, chip); document.getElementById('blurtResult').classList.remove('show'); });
+  blurtTopicsEl.appendChild(chip);
+});
+document.getElementById('blurtCheck').addEventListener('click', ()=>{
+  const text = document.getElementById('blurtText').value.trim();
+  const t = TOPICS[blurtTopic];
+  const {hits, pct} = checkCoverage(text || ' ', t.keywords);
+  document.getElementById('blurtResult').classList.add('show');
+  document.getElementById('blurtPct').textContent = pct+'%';
+  document.getElementById('blurtBarFill').style.width = pct+'%';
+  renderKwGrid(document.getElementById('blurtKwGrid'), t.keywords, hits);
+});
+document.getElementById('blurtClear').addEventListener('click', ()=>{
+  document.getElementById('blurtText').value='';
+  document.getElementById('blurtResult').classList.remove('show');
+});
+let blurtTimeLeft = 180, blurtInterval=null;
+document.getElementById('blurtTimerBtn').addEventListener('click', function(){
+  if(blurtInterval){ clearInterval(blurtInterval); blurtInterval=null; this.textContent='▶ Start 3-minute timer'; blurtTimeLeft=180; document.getElementById('blurtTimer').textContent='03:00'; return; }
+  this.textContent='⏸ Stop timer';
+  blurtInterval = setInterval(()=>{
+    blurtTimeLeft--;
+    const m = String(Math.floor(blurtTimeLeft/60)).padStart(2,'0');
+    const s = String(blurtTimeLeft%60).padStart(2,'0');
+    document.getElementById('blurtTimer').textContent = `${m}:${s}`;
+    if(blurtTimeLeft<=0){ clearInterval(blurtInterval); blurtInterval=null; document.getElementById('blurtTimerBtn').textContent='▶ Start 3-minute timer'; blurtTimeLeft=180; }
+  },1000);
+});
+
+/* ================= FEYNMAN AI ================= */
+let feynTopic = 'cancer';
+const feynTopicsEl = document.getElementById('feynmanTopics');
+TOPIC_ORDER.forEach(key=>{
+  const chip = document.createElement('div');
+  chip.className='topic-chip'+(key===feynTopic?' active':'');
+  chip.textContent = TOPICS[key].label;
+  chip.addEventListener('click', ()=>{ feynTopic=key; highlightChip(feynTopicsEl, chip); document.getElementById('feynmanResult').classList.remove('show'); });
+  feynTopicsEl.appendChild(chip);
+});
+document.getElementById('feynmanCheck').addEventListener('click', ()=>{
+  const text = document.getElementById('feynmanText').value.trim();
+  const t = TOPICS[feynTopic];
+  const {hits, pct} = checkCoverage(text || ' ', t.keywords);
+  document.getElementById('feynmanResult').classList.add('show');
+  document.getElementById('feynPct').textContent = pct+'%';
+  document.getElementById('feynBarFill').style.width = pct+'%';
+  renderKwGrid(document.getElementById('feynKwGrid'), t.keywords, hits);
+});
+document.getElementById('feynmanClear').addEventListener('click', ()=>{
+  document.getElementById('feynmanText').value='';
+  document.getElementById('feynmanResult').classList.remove('show');
+});
+
+/* mic: use Web Speech API if present, otherwise just tell the user to type */
+const micBtn = document.getElementById('micBtn');
+const micStatus = document.getElementById('micStatus');
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognizing = false, recognition = null;
+if(SpeechRec){
+  recognition = new SpeechRec();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.onresult = (e)=>{
+    let finalText = '';
+    for(let i=0;i<e.results.length;i++){ finalText += e.results[i][0].transcript + ' '; }
+    document.getElementById('feynmanText').value = finalText.trim();
+  };
+  recognition.onerror = ()=>{ micStatus.textContent='Mic access unavailable — you can type your explanation instead.'; };
+  recognition.onend = ()=>{ recognizing=false; micBtn.classList.remove('rec'); micStatus.textContent='Stopped listening — tap the mic to resume, or edit the text directly.'; };
+}
+micBtn.addEventListener('click', ()=>{
+  if(!SpeechRec){ micStatus.textContent="Speech input isn't supported in this browser — just type your explanation below instead."; return; }
+  if(!recognizing){
+    recognition.start(); recognizing=true; micBtn.classList.add('rec');
+    micStatus.textContent='Listening — explain it out loud as if teaching a beginner…';
+  } else {
+    recognition.stop(); recognizing=false; micBtn.classList.remove('rec');
+  }
+});
+</script>
+
+<script id="site-pager">
+(function(){
+  var prev={"href": "/notes/3-2-1-3-methods-of-studying-cells", "num": "3.2.1.3", "title": "Methods of Studying Cells"}, next={"href": "/notes/3-2-3-transport-across-cell-membranes", "num": "3.2.3", "title": "Transport Across Cell Membranes"};
+  function card(p,kind){
+    if(!p||!p.href) return '<a class="ghost"></a>';
+    return '<a class="'+kind+'" href="'+p.href+'"><div class="lbl">'+(kind==='prev'?'&#8592; Previous':'Next &#8594;')+
+      '</div><div class="nm"><span class="num">'+p.num+'</span> '+p.title+'</div></a>';
+  }
+  var host=document.getElementById('notesView');
+  if(host){
+    var nav=document.createElement('div');
+    nav.className='pager';
+    nav.innerHTML=card(prev,'prev')+card(next,'next');
+    host.appendChild(nav);
+  }
+  // persist theme across pages
+  var dt=document.getElementById('darkToggle');
+  if(dt){dt.addEventListener('click',function(){
+    try{localStorage.setItem('bcr-theme',document.documentElement.classList.contains('dark')?'dark':'light');}catch(e){}
+  });}
+  // close mobile sidebar after tapping a cross-page link
+  var sb=document.getElementById('sidebar');
+  if(sb){sb.addEventListener('click',function(e){
+    var a=e.target.closest('a[href]');
+    if(a&&sb.classList.contains('open')) sb.classList.remove('open');
+  });}
+})();
+</script>
+
+
+<script id="practice-js">
+(function(){
+  var KEY='bcr-level';
+  function apply(lvl){
+    document.querySelectorAll('.practice').forEach(function(p){
+      var qs=0, mk=0;
+      p.querySelectorAll('.prac-group').forEach(function(g){
+        var show = (lvl==='all') || (g.dataset.level===lvl);
+        g.hidden=!show;
+        if(show){
+          qs += g.querySelectorAll('.prac-q').length;
+          g.querySelectorAll('.prac-q').forEach(function(q){ mk += parseInt(q.dataset.marks,10)||0; });
+        }
+      });
+      var c=p.querySelector('[data-prac-count]'), m=p.querySelector('[data-prac-marks]');
+      if(c) c.textContent=qs; if(m) m.textContent=mk;
+      var e=p.querySelector('.prac-empty'), b=p.querySelector('.prac-body'), f=p.querySelector('.prac-foot');
+      if(e){ e.style.display = qs? 'none':'block'; }
+      if(b) b.style.display = qs? '':'none';
+      if(f) f.style.display = qs? '':'none';
+      p.querySelectorAll('.lvl-switch button').forEach(function(btn){
+        btn.classList.toggle('on', btn.dataset.lvl===lvl);
+      });
+    });
+  }
+  var saved='all';
+  try{ saved=localStorage.getItem(KEY)||'all'; }catch(e){}
+  document.addEventListener('click',function(e){
+    var btn=e.target.closest('.lvl-switch button');
+    if(btn){ try{localStorage.setItem(KEY,btn.dataset.lvl);}catch(e2){} apply(btn.dataset.lvl); return; }
+    var rev=e.target.closest('.prac-reveal');
+    if(rev){
+      var box=rev.closest('.practice');
+      var hidden=box.querySelector('.ms[hidden]')!==null;
+      box.querySelectorAll('.ms').forEach(function(m){ m.hidden=!hidden; });
+      rev.textContent = hidden ? 'Hide mark schemes' : 'Show mark schemes';
+    }
+  });
+  apply(saved);
+})();
+</script>
+</body>
+</html>
+
+
+
